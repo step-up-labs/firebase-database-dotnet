@@ -10,4 +10,39 @@ Install-Package FirebaseDatabase.net -pre
 ```
 
 ## Usage
-TODO
+
+### Querying
+
+```csharp
+var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
+var dinos = firebase
+  .Child("Dinosaurs")
+  .OrderByKey()
+  .StartAt("pterodactyl")
+  .LimitToFirst(2)
+  .OnceAsync<Dinosaur>();
+```
+
+### Saving data
+
+```csharp
+var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
+var dino = firebase
+  .Child("Dinosaurs")
+  .Post(new Dinosaur());
+  
+Console.WriteLine($"Key for the new dinosaur: {dino.Key}");  
+```
+
+### Realtime streaming
+
+```csharp
+var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
+var observable = firebase
+  .Child("Dinosaurs")
+  .AsObservable<Dinosaur>()
+  .Subscribe(d => Console.WriteLine(d.Key));
+  
+```
+
+```AsObservable<T>``` methods returns an ```IObservable<T>``` which you can take advantage of using [Reactive Extensions](https://github.com/Reactive-Extensions/Rx.NET)
