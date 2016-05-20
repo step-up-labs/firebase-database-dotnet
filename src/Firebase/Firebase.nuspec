@@ -6,7 +6,9 @@
 		<title>FirebaseDatabase.net</title>
 		<authors>Tomas Bezouska</authors>
 		<owners>Step Up Labs, Inc.</owners>
-    <iconUrl>https://github.com/step-up-labs/firebase-database-dotnet/tree/master/art/FirebaseLogo.128x128.png</iconUrl>
+    <iconUrl>https://github.com/step-up-labs/firebase-database-dotnet/raw/master/art/FirebaseLogo.128x128.png</iconUrl>
+    <licenseUrl>https://github.com/step-up-labs/firebase-database-dotnet/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/step-up-labs/firebase-database-dotnet</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Simple wrapper on top of Firebase Realtime Database REST API. </description>
 		<copyright>Step Up Labs, Inc. 2016</copyright>
