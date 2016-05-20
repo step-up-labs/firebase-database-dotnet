@@ -49,7 +49,8 @@ namespace Firebase.Query
             var key = FirebaseKeyGenerator.Next();
             var c = this.GetClient();
 
-            await new ChildQuery(key, this).SendAsync(c, obj, HttpMethod.Post);
+            // post would generate a new key server-side, while put can be used with an already generated local key
+            await new ChildQuery(key, this).SendAsync(c, obj, HttpMethod.Put);
 
             return new FirebaseObject<T>(key, obj);
         }
