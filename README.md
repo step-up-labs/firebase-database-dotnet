@@ -16,7 +16,7 @@ Install-Package FirebaseDatabase.net -pre
 ```csharp
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var dinos = firebase
-  .Child("Dinosaurs")
+  .Child("dinosaurs")
   .OrderByKey()
   .StartAt("pterodactyl")
   .LimitToFirst(2)
@@ -28,7 +28,7 @@ var dinos = firebase
 ```csharp
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var dino = firebase
-  .Child("Dinosaurs")
+  .Child("dinosaurs")
   .Post(new Dinosaur());
   
 Console.WriteLine($"Key for the new dinosaur: {dino.Key}");  
@@ -39,7 +39,7 @@ Console.WriteLine($"Key for the new dinosaur: {dino.Key}");
 ```csharp
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var observable = firebase
-  .Child("Dinosaurs")
+  .Child("dinosaurs")
   .AsObservable<Dinosaur>()
   .Subscribe(d => Console.WriteLine(d.Key));
   
