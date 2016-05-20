@@ -2,15 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>FirebaseDatabase.net</id>
-		<version>1.0.0-alpha1</version>
+		<version>1.0.0-alpha2</version>
 		<title>FirebaseDatabase.net</title>
-		<authors>Tomas Bezouska</authors>
+		<authors>Step Up Labs, Inc.</authors>
 		<owners>Step Up Labs, Inc.</owners>
     <iconUrl>https://github.com/step-up-labs/firebase-database-dotnet/raw/master/art/FirebaseLogo.128x128.png</iconUrl>
     <licenseUrl>https://github.com/step-up-labs/firebase-database-dotnet/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/step-up-labs/firebase-database-dotnet</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Simple wrapper on top of Firebase Realtime Database REST API. </description>
+		<description>Simple wrapper on top of Firebase Realtime Database REST API. Among others it supports streaming API which you can use for realtime notifications. </description>
 		<copyright>Step Up Labs, Inc. 2016</copyright>
 		<tags>Firebase Database Realtime</tags>
     <dependencies>
