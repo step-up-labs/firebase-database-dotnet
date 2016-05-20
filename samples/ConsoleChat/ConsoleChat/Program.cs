@@ -19,7 +19,7 @@
 
             Console.WriteLine("*******************************************************");
 
-            var client = new FirebaseClient("https://torrid-inferno-3642.firebaseio.com/");
+            var client = new FirebaseClient("https://yourfirebase.firebaseio.com/");
             var child = client.Child("messages");
             var o = child.AsObservable<Message>();
             
