@@ -45,7 +45,7 @@ var dino = await firebase
   .Child("dinosaurs")
   .PostAsync(new Dinosaur());
   
-// note that there is another override for the PostAsync method which delegates the new key generation to the firebase server
+// note that there is another overload for the PostAsync method which delegates the new key generation to the firebase server
   
 Console.WriteLine($"Key for the new dinosaur: {dino.Key}");  
 
