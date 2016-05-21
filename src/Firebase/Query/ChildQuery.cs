@@ -6,6 +6,8 @@ namespace Firebase.Query
 
     using Newtonsoft.Json;
 
+    using Firebase.Http;
+    
     /// <summary>
     /// Firebase query which references the child of current node.
     /// </summary>
@@ -44,15 +46,24 @@ namespace Firebase.Query
             this.client?.Dispose();
         }
 
-        public async Task<FirebaseObject<T>> PostAsync<T>(T obj)
+        public async Task<FirebaseObject<T>> PostAsync<T>(T obj, bool generateKeyOffline = true)
         {
-            var key = FirebaseKeyGenerator.Next();
-            var c = this.GetClient();
+            // post generates a new key server-side, while put can be used with an already generated local key
+            if (generateKeyOffline)
+            {
+                var key = FirebaseKeyGenerator.Next();
+                await new ChildQuery(key, this).PutAsync(obj);
 
-            // post would generate a new key server-side, while put can be used with an already generated local key
-            await new ChildQuery(key, this).SendAsync(c, obj, HttpMethod.Put);
+                return new FirebaseObject<T>(key, obj);
+            }
+            else
+            {
+                var c = this.GetClient();
+                var data = await this.SendAsync(c, obj, HttpMethod.Post);
+                var result = JsonConvert.DeserializeObject<PostResult>(data);
 
-            return new FirebaseObject<T>(key, obj);
+                return new FirebaseObject<T>(result.Name, obj);
+            }
         }
 
         public async Task PutAsync<T>(T obj)
@@ -86,7 +97,7 @@ namespace Firebase.Query
             return this.path;
         }
 
-        private async Task SendAsync<T>(HttpClient client, T obj, HttpMethod method)
+        private async Task<string> SendAsync<T>(HttpClient client, T obj, HttpMethod method)
         {
             var url = this.BuildUrl();
             var message = new HttpRequestMessage(method, url)
@@ -97,6 +108,8 @@ namespace Firebase.Query
             var result = await client.SendAsync(message);
 
             result.EnsureSuccessStatusCode();
+
+            return await result.Content.ReadAsStringAsync();
         }
 
         private HttpClient GetClient()
