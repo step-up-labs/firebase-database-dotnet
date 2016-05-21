@@ -21,13 +21,14 @@
 
             var client = new FirebaseClient("https://yourfirebase.firebaseio.com/");
             var child = client.Child("messages");
-            var o = child.AsObservable<Message>();
+            
+            var observable = child.AsObservable<Message>();
             
             // delete entire conversation list
             await child.DeleteAsync();
 
             // subscribe to messages comming in, ignoring the ones that are from me
-            var subscription = o
+            var subscription = observable
                 .Where(f => f.Object.Author != name)
                 .Subscribe(m => Console.WriteLine($"{m.Object.Author}: {m.Object.Content}"));
 
