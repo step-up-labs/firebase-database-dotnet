@@ -27,11 +27,20 @@ var dinos = firebase
 
 ```csharp
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
+
+// add new item to list of data and let the client generate new key for you (done offline)
 var dino = firebase
   .Child("dinosaurs")
   .Post(new Dinosaur());
   
 Console.WriteLine($"Key for the new dinosaur: {dino.Key}");  
+
+// add new item directly to the specified location (this will overwrite whatever data already exists at that location)
+var dino = firebase
+  .Child("dinosaurs")
+  .Child("t-rex")
+  .Put(new Dinosaur());
+
 ```
 
 ### Realtime streaming
