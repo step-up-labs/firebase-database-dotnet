@@ -5,6 +5,13 @@ namespace Firebase.Http
     /// </summary>
     public class PostResult
     {
-        public string Name { get; set; }
+        /// <summary>
+        /// Gets or sets the generated key after a successful post. 
+        /// </summary>
+        public string Name
+        {
+            get;
+            set;
+        }
     }
 }
