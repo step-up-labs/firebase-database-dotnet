@@ -16,6 +16,11 @@ namespace Firebase
         public FirebaseClient(string baseUrl)
         {
             this.baseUrl = baseUrl;
+
+            if (!this.baseUrl.EndsWith("/"))
+            {
+                this.baseUrl += "/";
+            }
         }
          
         /// <summary>
