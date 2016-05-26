@@ -1,4 +1,4 @@
-namespace Firebase.Http
+namespace Firebase.Database.Http
 {
     using System;
     using System.Collections;

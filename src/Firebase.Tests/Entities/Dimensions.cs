@@ -1,4 +1,4 @@
-﻿namespace FireBase.Tests.Entities
+﻿namespace Firebase.Database.Tests.Entities
 {
     public class Dimensions
     {

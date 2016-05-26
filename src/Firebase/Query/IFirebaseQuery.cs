@@ -1,10 +1,10 @@
-﻿namespace Firebase.Query
+﻿namespace Firebase.Database.Query
 {
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using Firebase.Streaming;
+    using Firebase.Database.Streaming;
 
     /// <summary>
     /// The FirebaseQuery interface.

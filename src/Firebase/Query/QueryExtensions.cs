@@ -1,4 +1,4 @@
-namespace Firebase.Query
+namespace Firebase.Database.Query
 {
     /// <summary>
     /// Query extensions providing linq like syntax for firebase server methods.

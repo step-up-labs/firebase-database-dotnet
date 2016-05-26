@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FireBase.Tests")]
+[assembly: AssemblyTitle("Firebase.Database.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Step Up Labs, Inc.")]
-[assembly: AssemblyProduct("FireBase.Tests")]
+[assembly: AssemblyProduct("Firebase.Database.Tests")]
 [assembly: AssemblyCopyright("Copyright © Step Up Labs, Inc. 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

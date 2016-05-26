@@ -1,4 +1,4 @@
-namespace Firebase.Query
+namespace Firebase.Database.Query
 {
     /// <summary>
     /// Represents a parameter in firebase query, e.g. "?data=foo"

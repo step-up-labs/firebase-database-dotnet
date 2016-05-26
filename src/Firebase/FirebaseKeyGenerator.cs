@@ -1,4 +1,4 @@
-namespace Firebase
+namespace Firebase.Database
 {
     using System;
     using System.Text;

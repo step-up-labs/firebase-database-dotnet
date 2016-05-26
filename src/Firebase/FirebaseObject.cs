@@ -1,4 +1,4 @@
-namespace Firebase
+namespace Firebase.Database
 {
     /// <summary>
     /// Holds the object of type <typeparam name="T" /> along with its key. 
