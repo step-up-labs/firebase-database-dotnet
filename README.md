@@ -5,6 +5,9 @@ Simple wrapper on top of [Firebase Realtime Database REST API](https://firebase.
 
 ## Installation
 ```csharp
+// Install release version
+Install-Package FirebaseDatabase.net
+
 // Install pre-release version
 Install-Package FirebaseDatabase.net -pre
 ```
