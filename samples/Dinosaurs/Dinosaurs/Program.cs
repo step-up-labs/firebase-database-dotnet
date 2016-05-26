@@ -3,7 +3,8 @@
     using System;
     using System.Threading.Tasks;
 
-    using Firebase.Query;
+    using Firebase.Database;
+    using Firebase.Database.Query;
 
     public class Program
     {

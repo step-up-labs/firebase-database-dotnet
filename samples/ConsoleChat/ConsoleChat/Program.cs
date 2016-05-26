@@ -4,6 +4,8 @@
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
+    using Firebase.Database;
+
     public class Program
     {
         public static void Main(string[] args)
