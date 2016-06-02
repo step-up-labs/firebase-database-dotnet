@@ -1,13 +1,13 @@
-namespace Firebase.Query
+namespace Firebase.Database.Query
 {
     using System;
     using System.Net.Http;
     using System.Threading.Tasks;
 
+    using Firebase.Database.Http;
+
     using Newtonsoft.Json;
 
-    using Firebase.Http;
-    
     /// <summary>
     /// Firebase query which references the child of current node.
     /// </summary>

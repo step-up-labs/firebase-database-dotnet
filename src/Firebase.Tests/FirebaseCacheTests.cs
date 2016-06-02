@@ -1,19 +1,15 @@
-﻿namespace FireBase.Tests
+﻿namespace Firebase.Database.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using Firebase;
-    using Firebase.Streaming;
-
-    using FireBase.Tests.Entities;
+    using Firebase.Database;
+    using Firebase.Database.Streaming;
+    using Firebase.Database.Tests.Entities;
 
     using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Newtonsoft.Json;
 
     [TestClass]
     public class FirebaseCacheTests

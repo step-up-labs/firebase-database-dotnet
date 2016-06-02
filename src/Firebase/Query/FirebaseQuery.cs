@@ -1,4 +1,4 @@
-namespace Firebase.Query
+namespace Firebase.Database.Query
 {
     using System;
     using System.Collections.Generic;
@@ -6,8 +6,8 @@ namespace Firebase.Query
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
-    using Firebase.Http;
-    using Firebase.Streaming;
+    using Firebase.Database.Http;
+    using Firebase.Database.Streaming;
 
     /// <summary>
     /// Represents a firebase query. 

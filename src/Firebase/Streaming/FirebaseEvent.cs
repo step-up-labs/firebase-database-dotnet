@@ -1,4 +1,4 @@
-namespace Firebase.Streaming
+namespace Firebase.Database.Streaming
 {
     /// <summary>
     /// Firebase event which hold <see cref="EventType"/> and the object affected by the event.

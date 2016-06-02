@@ -1,4 +1,4 @@
-namespace Firebase
+namespace Firebase.Database
 {
     using System;
     using System.Text;
@@ -7,7 +7,7 @@ namespace Firebase
     /// Offline key generator which mimics the official Firebase generators. 
     /// Credit: https://github.com/bubbafat/FirebaseSharp/blob/master/src/FirebaseSharp.Portable/FireBasePushIdGenerator.cs
     /// </summary>
-    public class FirebaseKeyGenerator
+    public class FirebaseKeyGenerator 
     {
         // Modeled after base64 web-safe chars, but ordered by ASCII.
         private const string PushCharsString = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
@@ -25,6 +25,11 @@ namespace Firebase
             PushChars = Encoding.UTF8.GetChars(Encoding.UTF8.GetBytes(PushCharsString));
         }
 
+        /// <summary>
+        /// Returns next firebase key based on current time.  
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>. </returns>
         public static string Next()
         {
             // We generate 72-bits of randomness which get turned into 12 characters and
@@ -33,7 +38,7 @@ namespace Firebase
             // characters except "incremented" by one.
             var id = new StringBuilder(20);
             var now = (long)(DateTimeOffset.Now - Epoch).TotalMilliseconds;
-            var duplicateTime = (now == lastPushTime);
+            var duplicateTime = now == lastPushTime;
             lastPushTime = now;
 
             var timeStampChars = new char[8];

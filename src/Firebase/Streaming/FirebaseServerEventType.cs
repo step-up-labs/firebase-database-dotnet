@@ -1,4 +1,4 @@
-namespace Firebase.Streaming
+namespace Firebase.Database.Streaming
 {
     internal enum FirebaseServerEventType
     {

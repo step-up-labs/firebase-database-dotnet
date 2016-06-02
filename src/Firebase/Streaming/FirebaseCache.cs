@@ -1,4 +1,4 @@
-namespace Firebase.Streaming
+namespace Firebase.Database.Streaming
 {
     using System;
     using System.Collections;
@@ -6,9 +6,7 @@ namespace Firebase.Streaming
     using System.Linq;
     using System.Reflection;
 
-    using AutoMapper;
-
-    using Firebase.Http;
+    using Firebase.Database.Http;
 
     using Newtonsoft.Json;
 

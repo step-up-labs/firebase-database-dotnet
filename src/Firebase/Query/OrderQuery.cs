@@ -1,4 +1,4 @@
-namespace Firebase.Query
+namespace Firebase.Database.Query
 {
     /// <summary>
     /// Represents a firebase ordering query, e.g. "?OrderBy=Foo"

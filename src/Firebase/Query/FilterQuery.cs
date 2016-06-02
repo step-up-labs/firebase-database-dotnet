@@ -1,4 +1,4 @@
-namespace Firebase.Query 
+namespace Firebase.Database.Query 
 {
     /// <summary>
     /// Represents a firebase filtering query, e.g. "?LimitToLast=10"

@@ -1,4 +1,4 @@
-namespace Firebase.Streaming
+namespace Firebase.Database.Streaming
 {
     using System;
     using System.Diagnostics;
@@ -9,7 +9,7 @@ namespace Firebase.Streaming
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Firebase.Query;
+    using Firebase.Database.Query;
 
     using Newtonsoft.Json.Linq;
 

@@ -1,6 +1,6 @@
-namespace Firebase
+namespace Firebase.Database
 {
-    using Firebase.Query;
+    using Firebase.Database.Query;
 
     /// <summary>
     /// Firebase client which acts as an entry point to the online database.

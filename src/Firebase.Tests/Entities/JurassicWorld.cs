@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-
-namespace FireBase.Tests.Entities
+namespace Firebase.Database.Tests.Entities
 {
+    using System.Collections.Generic;
+
     public class JurassicWorld
     {
         public JurassicWorld()
