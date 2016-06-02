@@ -6,6 +6,17 @@ namespace Firebase.Query
     public static class QueryExtensions
     {
         /// <summary>
+        /// Adds an auth parameter to the query.
+        /// </summary>
+        /// <param name="node"> The child. </param>
+        /// <param name="token"> The auth token. </param>
+        /// <returns> The <see cref="AuthQuery"/>. </returns>
+        public static AuthQuery WithAuth(this FirebaseQuery node, string token)
+        {
+            return new AuthQuery(node, token);
+        }
+
+        /// <summary>
         /// References a sub child of the existing node.
         /// </summary>
         /// <param name="node"> The child. </param>
