@@ -1,7 +1,7 @@
-namespace FireBase.Tests
+namespace FireBase.Database.Tests
 {
-    using Firebase;
-    using Firebase.Query;
+    using Firebase.Database;
+    using Firebase.Database.Query;
     using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

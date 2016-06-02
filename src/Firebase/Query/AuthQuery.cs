@@ -1,4 +1,4 @@
-namespace Firebase.Query
+namespace Firebase.Database.Query
 {
     using System;
 
