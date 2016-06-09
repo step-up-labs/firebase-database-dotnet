@@ -1,5 +1,8 @@
 namespace Firebase.Database
 {
+    using System;
+    using System.Threading.Tasks;
+
     using Firebase.Database.Query;
 
     /// <summary>
@@ -7,6 +10,8 @@ namespace Firebase.Database
     /// </summary>
     public class FirebaseClient
     {
+        internal readonly Func<Task<string>> AuthTokenAsyncFactory;
+
         private readonly string baseUrl;
 
         /// <summary>
@@ -22,7 +27,17 @@ namespace Firebase.Database
                 this.baseUrl += "/";
             }
         }
-         
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
+        /// </summary>
+        /// <param name="baseUrl"> The base url. </param>
+        /// <param name="authTokenAsyncFactory"> Factory which returns valid firebase auth token. </param>
+        public FirebaseClient(string baseUrl, Func<Task<string>> authTokenAsyncFactory) : this(baseUrl)
+        {
+            this.AuthTokenAsyncFactory = authTokenAsyncFactory;
+        }
+
         /// <summary>
         /// Queries for a child of the data root.
         /// </summary>
@@ -30,7 +45,7 @@ namespace Firebase.Database
         /// <returns> <see cref="ChildQuery"/>. </returns>
         public ChildQuery Child(string resourceName)
         {
-            return new ChildQuery(this.baseUrl + resourceName);
+            return new ChildQuery(this.baseUrl + resourceName, this);
         }
     }
 }

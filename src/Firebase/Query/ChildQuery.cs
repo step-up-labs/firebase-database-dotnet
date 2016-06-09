@@ -10,10 +10,11 @@ namespace Firebase.Database.Query
         /// <summary>
         /// Initializes a new instance of the <see cref="ChildQuery"/> class.
         /// </summary>
-        /// <param name="path"> The path to the child node. </param>
-        /// <param name="parent"> The parent. </param>
-        public ChildQuery(string path, FirebaseQuery parent)
-            : base(parent)
+        /// <param name="path"> The path to the child node.  </param>
+        /// <param name="parent"> The parent.  </param>
+        /// <param name="client"> The owner. </param>
+        public ChildQuery(string path, FirebaseQuery parent, FirebaseClient client)
+            : base(parent, client)
         {
             this.path = path;
 
@@ -26,9 +27,10 @@ namespace Firebase.Database.Query
         /// <summary>
         /// Initializes a new instance of the <see cref="ChildQuery"/> class.
         /// </summary>
-        /// <param name="path"> The path to the child node. </param>
-        public ChildQuery(string path)
-            : this(path, null)
+        /// <param name="path"> The path to the child node.  </param>
+        /// <param name="client"> The client. </param>
+        public ChildQuery(string path, FirebaseClient client)
+            : this(path, null, client)
         {
         }
 

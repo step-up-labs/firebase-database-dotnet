@@ -1,9 +1,11 @@
 <StyleCopSettings Version="105">
   <GlobalSettings>
     <CollectionProperty Name="RecognizedWords">
+      <Value>auth</Value>
       <Value>firebase</Value>
       <Value>json</Value>
       <Value>linq</Value>
+      <Value>oauth</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

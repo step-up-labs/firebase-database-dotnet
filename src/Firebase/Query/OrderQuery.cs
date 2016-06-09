@@ -7,8 +7,8 @@ namespace Firebase.Database.Query
     {
         private readonly string propertyName;
 
-        public OrderQuery(ChildQuery parent, string propertyName)
-            : base(parent, "orderBy")
+        public OrderQuery(ChildQuery parent, string propertyName, FirebaseClient client)
+            : base(parent, "orderBy", client)
         {
             this.propertyName = propertyName;
         }

@@ -1,5 +1,7 @@
 namespace FireBase.Database.Tests
 {
+    using System.Threading.Tasks;
+
     using Firebase.Database;
     using Firebase.Database.Query;
     using FluentAssertions;
@@ -16,7 +18,7 @@ namespace FireBase.Database.Tests
         {
             var client = new FirebaseClient(BasePath);
 
-            var path = client.Child("resource").WithAuth(Token).BuildUrl();
+            var path = client.Child("resource").WithAuth(Token).BuildUrlAsync().Result;
 
             path.Should().BeEquivalentTo($"{BasePath}/resource/.json?auth={Token}");
         }
@@ -26,7 +28,17 @@ namespace FireBase.Database.Tests
         {
             var client = new FirebaseClient(BasePath);
 
-            var path = client.Child("resource").OrderByKey().WithAuth(Token).BuildUrl();
+            var path = client.Child("resource").OrderByKey().WithAuth(Token).BuildUrlAsync().Result;
+
+            path.Should().BeEquivalentTo($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
+        }
+
+        [TestMethod]
+        public void TestClientAuthPath()
+        {
+            var client = new FirebaseClient(BasePath, () => Task.FromResult(Token));
+
+            var path = client.Child("resource").OrderByKey().BuildUrlAsync().Result;
 
             path.Should().BeEquivalentTo($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
         }

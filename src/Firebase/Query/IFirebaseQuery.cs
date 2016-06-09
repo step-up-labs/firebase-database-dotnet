@@ -29,6 +29,6 @@
         /// Builds the actual url of this query.
         /// </summary>
         /// <returns> The <see cref="string"/>. </returns>
-        string BuildUrl();
+        Task<string> BuildUrlAsync();
     }
 }

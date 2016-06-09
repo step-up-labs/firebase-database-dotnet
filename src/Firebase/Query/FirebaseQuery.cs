@@ -24,9 +24,19 @@ namespace Firebase.Database.Query
         /// Initializes a new instance of the <see cref="FirebaseQuery"/> class.
         /// </summary>
         /// <param name="parent"> The parent of this query. </param>
-        protected FirebaseQuery(FirebaseQuery parent)
+        /// <param name="client"> The owning client. </param>
+        protected FirebaseQuery(FirebaseQuery parent, FirebaseClient client)
         {
+            this.Client = client;
             this.Parent = parent;
+        }
+
+        /// <summary>
+        /// Gets the client.
+        /// </summary>
+        public FirebaseClient Client
+        {
+            get;
         }
 
         /// <summary>
@@ -36,7 +46,7 @@ namespace Firebase.Database.Query
         /// <returns> Collection of <see cref="FirebaseObject{T}"/> holding the entities returned by server. </returns>
         public async Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsync<T>()
         {
-            var path = this.BuildUrl();
+            var path = await this.BuildUrlAsync();
 
             using (var client = new HttpClient())
             {
@@ -58,8 +68,15 @@ namespace Firebase.Database.Query
         /// Builds the actual URL of this query.
         /// </summary>
         /// <returns> The <see cref="string"/>. </returns>
-        public string BuildUrl()
+        public async Task<string> BuildUrlAsync()
         {
+            // if token factory is present on the parent then use it to generate auth token
+            if (this.Client.AuthTokenAsyncFactory != null)
+            {
+                var token = await this.Client.AuthTokenAsyncFactory();
+                return this.WithAuth(token).BuildUrl(null);
+            }
+
             return this.BuildUrl(null);
         }
 
@@ -74,7 +91,7 @@ namespace Firebase.Database.Query
             if (generateKeyOffline)
             {
                 var key = FirebaseKeyGenerator.Next();
-                await new ChildQuery(key, this).PutAsync(obj);
+                await new ChildQuery(key, this.Parent, this.Client).PutAsync(obj);
 
                 return new FirebaseObject<T>(key, obj);
             }
@@ -98,7 +115,7 @@ namespace Firebase.Database.Query
         public async Task DeleteAsync()
         {
             var c = this.GetClient();
-            var url = this.BuildUrl();
+            var url = await this.BuildUrlAsync();
             var result = await c.DeleteAsync(url);
 
             result.EnsureSuccessStatusCode();
@@ -135,7 +152,7 @@ namespace Firebase.Database.Query
 
         private async Task<string> SendAsync<T>(HttpClient client, T obj, HttpMethod method)
         {
-            var url = this.BuildUrl();
+            var url = await this.BuildUrlAsync();
             var message = new HttpRequestMessage(method, url)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(obj))

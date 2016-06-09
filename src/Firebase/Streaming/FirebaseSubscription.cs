@@ -23,7 +23,6 @@ namespace Firebase.Database.Streaming
         private readonly HttpClient httpClient;
         private readonly IObserver<FirebaseEvent<T>> observer;
         private readonly IFirebaseQuery query;
-        private readonly string url;
         private readonly FirebaseCache<T> cache;
 
         /// <summary>
@@ -38,7 +37,6 @@ namespace Firebase.Database.Streaming
             this.cancel = new CancellationTokenSource();
             this.httpClient = new HttpClient();
             this.cache = new FirebaseCache<T>();
-            this.url = this.query.BuildUrl();
 
             var handler = new HttpClientHandler
             {
@@ -77,7 +75,7 @@ namespace Firebase.Database.Streaming
 
                     // initialize network connection
                     var serverEvent = FirebaseServerEventType.KeepAlive;
-                    var request = new HttpRequestMessage(HttpMethod.Get, this.url);
+                    var request = new HttpRequestMessage(HttpMethod.Get, await this.query.BuildUrlAsync());
                     var response = await this.httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
                     response.EnsureSuccessStatusCode();
@@ -107,6 +105,12 @@ namespace Firebase.Database.Streaming
                                 case "data":
                                     this.ProcessServerData(serverEvent, tuple[1]);
                                     break;
+                            }
+
+                            if (serverEvent == FirebaseServerEventType.AuthRevoked)
+                            {
+                                // auth token no longer valid, reconnect
+                                break;
                             }
                         }
                     }

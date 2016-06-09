@@ -35,7 +35,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <None Include="Firebase.nuspec" />
+    <None Include="Firebase.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@ namespace Firebase.Database.Query
     {
         private readonly string token;
 
-        public AuthQuery(FirebaseQuery parent, string token) : base(parent, "auth")
+        public AuthQuery(FirebaseQuery parent, string token, FirebaseClient client) : base(parent, "auth", client)
         {
             this.token = token;
         }

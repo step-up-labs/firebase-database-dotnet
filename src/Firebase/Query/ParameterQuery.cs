@@ -8,8 +8,8 @@ namespace Firebase.Database.Query
         private readonly string parameter;
         private readonly string separator;
 
-        protected ParameterQuery(FirebaseQuery parent, string parameter)
-            : base(parent)
+        protected ParameterQuery(FirebaseQuery parent, string parameter, FirebaseClient client)
+            : base(parent, client)
         {
             this.parameter = parameter;
             this.separator = (this.Parent is ChildQuery) ? "?" : "&";

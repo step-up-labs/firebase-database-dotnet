@@ -8,14 +8,14 @@ namespace Firebase.Database.Query
         private readonly string value;
         private readonly double? doubleValue;
 
-        public FilterQuery(FirebaseQuery parent, string filter, string value)
-            : base(parent, filter)
+        public FilterQuery(FirebaseQuery parent, string filter, string value, FirebaseClient client)
+            : base(parent, filter, client)
         {
             this.value = value;
         }
 
-        public FilterQuery(FirebaseQuery parent, string filter, double value)
-            : base(parent, filter)
+        public FilterQuery(FirebaseQuery parent, string filter, double value, FirebaseClient client)
+            : base(parent, filter, client)
         {
             this.doubleValue = value;
         }

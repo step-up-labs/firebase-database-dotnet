@@ -13,7 +13,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="AuthQuery"/>. </returns>
         public static AuthQuery WithAuth(this FirebaseQuery node, string token)
         {
-            return new AuthQuery(node, token);
+            return new AuthQuery(node, token, node.Client);
         }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="ChildQuery"/>. </returns>
         public static ChildQuery Child(this ChildQuery node, string path)
         {
-            return new ChildQuery(path, node);
+            return new ChildQuery(path, node, node.Client);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="OrderQuery"/>. </returns>
         public static OrderQuery OrderBy(this ChildQuery child, string propertyName)
         {
-            return new OrderQuery(child, propertyName);
+            return new OrderQuery(child, propertyName, child.Client);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery StartAt(this ParameterQuery child, string value)
         {
-            return new FilterQuery(child, "startAt", value);
+            return new FilterQuery(child, "startAt", value, child.Client);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery EndAt(this ParameterQuery child, string value)
         {
-            return new FilterQuery(child, "endAt", value);
+            return new FilterQuery(child, "endAt", value, child.Client);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery EqualTo(this ParameterQuery child, string value)
         {
-            return new FilterQuery(child, "equalTo", value);
+            return new FilterQuery(child, "equalTo", value, child.Client);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery StartAt(this ParameterQuery child, double value)
         {
-            return new FilterQuery(child, "startAt", value);
+            return new FilterQuery(child, "startAt", value, child.Client);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery EndAt(this ParameterQuery child, double value)
         {
-            return new FilterQuery(child, "endAt", value);
+            return new FilterQuery(child, "endAt", value, child.Client);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery EqualTo(this ParameterQuery child, double value)
         {
-            return new FilterQuery(child, "equalTo", value);
+            return new FilterQuery(child, "equalTo", value, child.Client);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery LimitToFirst(this ParameterQuery child, int count)
         {
-            return new FilterQuery(child, "limitToFirst", count);
+            return new FilterQuery(child, "limitToFirst", count, child.Client);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="FilterQuery"/>. </returns>
         public static FilterQuery LimitToLast(this ParameterQuery child, int count)
         {
-            return new FilterQuery(child, "limitToLast", count);
+            return new FilterQuery(child, "limitToLast", count, child.Client);
         }
     }
 }
