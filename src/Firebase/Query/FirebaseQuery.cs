@@ -9,13 +9,17 @@ namespace Firebase.Database.Query
     using Firebase.Database.Http;
     using Firebase.Database.Streaming;
 
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Represents a firebase query. 
     /// </summary>
-    public abstract class FirebaseQuery : IFirebaseQuery
+    public abstract class FirebaseQuery : IFirebaseQuery, IDisposable
     {
         protected readonly FirebaseQuery Parent;
          
+        private HttpClient client;
+
         /// <summary> 
         /// Initializes a new instance of the <see cref="FirebaseQuery"/> class.
         /// </summary>
@@ -59,6 +63,47 @@ namespace Firebase.Database.Query
             return this.BuildUrl(null);
         }
 
+        public void Dispose()
+        {
+            this.client?.Dispose();
+        }
+
+        public async Task<FirebaseObject<T>> PostAsync<T>(T obj, bool generateKeyOffline = true)
+        {
+            // post generates a new key server-side, while put can be used with an already generated local key
+            if (generateKeyOffline)
+            {
+                var key = FirebaseKeyGenerator.Next();
+                await new ChildQuery(key, this).PutAsync(obj);
+
+                return new FirebaseObject<T>(key, obj);
+            }
+            else
+            {
+                var c = this.GetClient();
+                var data = await this.SendAsync(c, obj, HttpMethod.Post);
+                var result = JsonConvert.DeserializeObject<PostResult>(data);
+
+                return new FirebaseObject<T>(result.Name, obj);
+            }
+        }
+
+        public async Task PutAsync<T>(T obj)
+        {
+            var c = this.GetClient();
+
+            await this.SendAsync(c, obj, HttpMethod.Put);
+        }
+
+        public async Task DeleteAsync()
+        {
+            var c = this.GetClient();
+            var url = this.BuildUrl();
+            var result = await c.DeleteAsync(url);
+
+            result.EnsureSuccessStatusCode();
+        }
+
         /// <summary>
         /// Build the url segment of this child.
         /// </summary>
@@ -76,6 +121,31 @@ namespace Firebase.Database.Query
             }
 
             return url;
+        }
+
+        private HttpClient GetClient()
+        {
+            if (this.client == null)
+            {
+                this.client = new HttpClient();
+            }
+
+            return this.client;
+        }
+
+        private async Task<string> SendAsync<T>(HttpClient client, T obj, HttpMethod method)
+        {
+            var url = this.BuildUrl();
+            var message = new HttpRequestMessage(method, url)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(obj))
+            };
+
+            var result = await client.SendAsync(message);
+
+            result.EnsureSuccessStatusCode();
+
+            return await result.Content.ReadAsStringAsync();
         }
     }
 }

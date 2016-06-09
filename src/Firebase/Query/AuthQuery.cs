@@ -1,7 +1,5 @@
 namespace Firebase.Database.Query
 {
-    using System;
-
     /// <summary>
     /// Represents an auth parameter in firebase query, e.g. "?auth=xyz"
     /// </summary>
