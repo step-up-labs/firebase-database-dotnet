@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>FirebaseDatabase.net</id>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 		<title>FirebaseDatabase.net</title>
 		<authors>Step Up Labs, Inc.</authors>
 		<owners>Step Up Labs, Inc.</owners>
