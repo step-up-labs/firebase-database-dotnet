@@ -15,7 +15,7 @@ namespace Firebase.Database.Query
 
         protected override string BuildUrlParameter(FirebaseQuery child)
         {
-            return $"\"{this.propertyName.ToLower()}\"";
+            return $"\"{this.propertyName}\"";
         }
     }
 }

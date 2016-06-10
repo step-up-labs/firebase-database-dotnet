@@ -24,7 +24,7 @@ namespace Firebase.Database.Query
         {
             if (this.value != null)
             {
-                return $"\"{this.value.ToLower()}\"";
+                return $"\"{this.value}\"";
             }
             else if (this.doubleValue.HasValue)
             {

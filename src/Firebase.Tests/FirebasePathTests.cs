@@ -11,7 +11,7 @@ namespace FireBase.Database.Tests
     public class FirebasePathTests
     {
         public const string BasePath = "http://base.path.net";
-        public const string Token = "abcefgh";
+        public const string Token = "aBcEfgH";
 
         [TestMethod]
         public void TestAuthPath()
@@ -20,7 +20,7 @@ namespace FireBase.Database.Tests
 
             var path = client.Child("resource").WithAuth(Token).BuildUrlAsync().Result;
 
-            path.Should().BeEquivalentTo($"{BasePath}/resource/.json?auth={Token}");
+            path.Should().Be($"{BasePath}/resource/.json?auth={Token}");
         }
 
         [TestMethod]
@@ -30,7 +30,7 @@ namespace FireBase.Database.Tests
 
             var path = client.Child("resource").OrderByKey().WithAuth(Token).BuildUrlAsync().Result;
 
-            path.Should().BeEquivalentTo($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
+            path.Should().Be($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
         }
 
         [TestMethod]
@@ -40,7 +40,17 @@ namespace FireBase.Database.Tests
 
             var path = client.Child("resource").OrderByKey().BuildUrlAsync().Result;
 
-            path.Should().BeEquivalentTo($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
+            path.Should().Be($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
+        }
+
+        [TestMethod]
+        public void TestCaseSensitivePath()
+        {
+            var client = new FirebaseClient(BasePath);
+
+            var path = client.Child("resource").OrderByKey().StartAt(Token).EndAt(Token).BuildUrlAsync().Result;
+
+            path.Should().Be($"{BasePath}/resource/.json?orderBy=\"$key\"&startAt=\"{Token}\"&endAt=\"{Token}\"");
         }
     }
 }
