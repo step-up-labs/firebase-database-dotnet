@@ -105,6 +105,13 @@ namespace Firebase.Database.Query
             }
         }
 
+        public async Task PatchAsync<T>(T obj)
+        {
+            var c = this.GetClient();
+
+            await this.SendAsync(c, obj, new HttpMethod("PATCH"));
+        }
+
         public async Task PutAsync<T>(T obj)
         {
             var c = this.GetClient();
