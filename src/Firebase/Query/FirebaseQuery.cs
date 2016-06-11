@@ -54,6 +54,23 @@ namespace Firebase.Database.Query
             }
         }
 
+
+        /// <summary>
+        /// Assumes given query is pointing to a single object of type <typeparamref name="T"/> and retrieves it.
+        /// </summary>
+        /// <typeparam name="T"> Type of elements. </typeparam>
+        /// <returns> Single object of type <typeparamref name="T"/>. </returns>
+        public async Task<T> OnceSingleAsync<T>()
+        {
+            var path = await this.BuildUrlAsync();
+
+            using (var client = new HttpClient())
+            {
+                var data = await client.GetStringAsync(path);
+                return JsonConvert.DeserializeObject<T>(data);
+            }
+        }
+
         /// <summary>
         /// Starts observing this query watching for changes real time sent by the server.
         /// </summary>
