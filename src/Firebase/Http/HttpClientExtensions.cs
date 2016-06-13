@@ -26,6 +26,11 @@ namespace Firebase.Database.Http
             var data = await client.GetStringAsync(requestUri);
             var dictionary = JsonConvert.DeserializeObject<Dictionary<string, T>>(data);
 
+            if (dictionary == null)
+            {
+                return new FirebaseObject<T>[0];
+            }
+
             return dictionary.Select(item => new FirebaseObject<T>(item.Key, item.Value)).ToList();
         }
 
@@ -39,6 +44,11 @@ namespace Firebase.Database.Http
         {
             var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), elementType);
             var dictionary = JsonConvert.DeserializeObject(data, dictionaryType) as IDictionary;
+
+            if (dictionary == null)
+            {
+                yield break;
+            }
 
             foreach (DictionaryEntry item in dictionary)
             {
