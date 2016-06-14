@@ -75,8 +75,8 @@ namespace Firebase.Database.Streaming
 
                     // initialize network connection
                     var serverEvent = FirebaseServerEventType.KeepAlive;
-                    var request = new HttpRequestMessage(HttpMethod.Get, await this.query.BuildUrlAsync());
-                    var response = await this.httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                    var request = new HttpRequestMessage(HttpMethod.Get, await this.query.BuildUrlAsync().ConfigureAwait(false));
+                    var response = await this.httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
                     response.EnsureSuccessStatusCode();
 
@@ -91,7 +91,7 @@ namespace Firebase.Database.Streaming
 
                             if (string.IsNullOrWhiteSpace(line))
                             {
-                                await Task.Delay(2000);
+                                await Task.Delay(2000).ConfigureAwait(false);
                                 continue;
                             }
 
@@ -124,7 +124,7 @@ namespace Firebase.Database.Streaming
                     Debug.WriteLine("************************************************************");
                     Debug.WriteLine(ex.ToString());
                     Debug.WriteLine("************************************************************");
-                    await Task.Delay(2000);
+                    await Task.Delay(2000).ConfigureAwait(false);
                 }
             }
         }

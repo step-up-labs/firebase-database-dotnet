@@ -46,11 +46,11 @@ namespace Firebase.Database.Query
         /// <returns> Collection of <see cref="FirebaseObject{T}"/> holding the entities returned by server. </returns>
         public async Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsync<T>()
         {
-            var path = await this.BuildUrlAsync();
+            var path = await this.BuildUrlAsync().ConfigureAwait(false);
 
             using (var client = new HttpClient())
             {
-                return await client.GetObjectCollectionAsync<T>(path);
+                return await client.GetObjectCollectionAsync<T>(path).ConfigureAwait(false);
             }
         }
 
@@ -62,11 +62,11 @@ namespace Firebase.Database.Query
         /// <returns> Single object of type <typeparamref name="T"/>. </returns>
         public async Task<T> OnceSingleAsync<T>()
         {
-            var path = await this.BuildUrlAsync();
+            var path = await this.BuildUrlAsync().ConfigureAwait(false);
 
             using (var client = new HttpClient())
             {
-                var data = await client.GetStringAsync(path);
+                var data = await client.GetStringAsync(path).ConfigureAwait(false);
                 return JsonConvert.DeserializeObject<T>(data);
             }
         }
@@ -90,7 +90,7 @@ namespace Firebase.Database.Query
             // if token factory is present on the parent then use it to generate auth token
             if (this.Client.AuthTokenAsyncFactory != null)
             {
-                var token = await this.Client.AuthTokenAsyncFactory();
+                var token = await this.Client.AuthTokenAsyncFactory().ConfigureAwait(false);
                 return this.WithAuth(token).BuildUrl(null);
             }
 
@@ -108,14 +108,14 @@ namespace Firebase.Database.Query
             if (generateKeyOffline)
             {
                 var key = FirebaseKeyGenerator.Next();
-                await new ChildQuery(key, this.Parent, this.Client).PutAsync(obj);
+                await new ChildQuery(key, this.Parent, this.Client).PutAsync(obj).ConfigureAwait(false);
 
                 return new FirebaseObject<T>(key, obj);
             }
             else
             {
                 var c = this.GetClient();
-                var data = await this.SendAsync(c, obj, HttpMethod.Post);
+                var data = await this.SendAsync(c, obj, HttpMethod.Post).ConfigureAwait(false);
                 var result = JsonConvert.DeserializeObject<PostResult>(data);
 
                 return new FirebaseObject<T>(result.Name, obj);
@@ -126,21 +126,21 @@ namespace Firebase.Database.Query
         {
             var c = this.GetClient();
 
-            await this.SendAsync(c, obj, new HttpMethod("PATCH"));
+            await this.SendAsync(c, obj, new HttpMethod("PATCH")).ConfigureAwait(false);
         }
 
         public async Task PutAsync<T>(T obj)
         {
             var c = this.GetClient();
 
-            await this.SendAsync(c, obj, HttpMethod.Put);
+            await this.SendAsync(c, obj, HttpMethod.Put).ConfigureAwait(false);
         }
 
         public async Task DeleteAsync()
         {
             var c = this.GetClient();
-            var url = await this.BuildUrlAsync();
-            var result = await c.DeleteAsync(url);
+            var url = await this.BuildUrlAsync().ConfigureAwait(false);
+            var result = await c.DeleteAsync(url).ConfigureAwait(false);
 
             result.EnsureSuccessStatusCode();
         }
@@ -176,17 +176,17 @@ namespace Firebase.Database.Query
 
         private async Task<string> SendAsync<T>(HttpClient client, T obj, HttpMethod method)
         {
-            var url = await this.BuildUrlAsync();
+            var url = await this.BuildUrlAsync().ConfigureAwait(false);
             var message = new HttpRequestMessage(method, url)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(obj))
             };
 
-            var result = await client.SendAsync(message);
+            var result = await client.SendAsync(message).ConfigureAwait(false);
 
             result.EnsureSuccessStatusCode();
 
-            return await result.Content.ReadAsStringAsync();
+            return await result.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
     }
 }
