@@ -1,37 +1,40 @@
 namespace Firebase.Database.Query 
 {
+    using System;
+    using System.Globalization;
+
     /// <summary>
     /// Represents a firebase filtering query, e.g. "?LimitToLast=10".
     /// </summary>
     public class FilterQuery : ParameterQuery 
     {
-        private readonly string value;
-        private readonly double? doubleValue;
+        private readonly Func<string> valueFactory;
+        private readonly Func<double> doubleValueFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterQuery"/> class.
         /// </summary>
         /// <param name="parent"> The parent. </param>
-        /// <param name="filter"> The filter. </param>
-        /// <param name="value"> The value for filter. </param>
+        /// <param name="filterFactory"> The filter. </param>
+        /// <param name="valueFactory"> The value for filter. </param>
         /// <param name="client"> The owning client. </param>  
-        public FilterQuery(FirebaseQuery parent, string filter, string value, FirebaseClient client)
-            : base(parent, filter, client)
+        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<string> valueFactory, FirebaseClient client)
+            : base(parent, filterFactory, client)
         {
-            this.value = value;
+            this.valueFactory = valueFactory;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterQuery"/> class.
         /// </summary>
         /// <param name="parent"> The parent. </param>
-        /// <param name="filter"> The filter. </param>
-        /// <param name="value"> The value for filter. </param>
+        /// <param name="filterFactory"> The filter. </param>
+        /// <param name="valueFactory"> The value for filter. </param>
         /// <param name="client"> The owning client. </param>
-        public FilterQuery(FirebaseQuery parent, string filter, double value, FirebaseClient client)
-            : base(parent, filter, client)
+        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<double> valueFactory, FirebaseClient client)
+            : base(parent, filterFactory, client)
         {
-            this.doubleValue = value;
+            this.doubleValueFactory = valueFactory;
         }
 
         /// <summary>
@@ -41,13 +44,13 @@ namespace Firebase.Database.Query
         /// <returns> Url parameter part of the resulting path. </returns> 
         protected override string BuildUrlParameter(FirebaseQuery child)
         {
-            if (this.value != null)
+            if (this.valueFactory != null)
             {
-                return $"\"{this.value}\"";
+                return $"\"{this.valueFactory()}\"";
             }
-            else if (this.doubleValue.HasValue)
+            else if (this.doubleValueFactory != null)
             {
-                return this.doubleValue.Value.ToString();
+                return this.doubleValueFactory().ToString(CultureInfo.InvariantCulture);
             }
 
             return string.Empty;

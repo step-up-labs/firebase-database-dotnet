@@ -55,6 +55,7 @@
     <Compile Include="Query\IFirebaseQuery.cs" />
     <Compile Include="Query\OrderQuery.cs" />
     <Compile Include="Query\ParameterQuery.cs" />
+    <Compile Include="Query\QueryFactoryExtensions.cs" />
     <Compile Include="Query\QueryExtensions.cs" />
     <Compile Include="Streaming\FirebaseCache.cs" />
     <Compile Include="Streaming\FirebaseEvent.cs" />

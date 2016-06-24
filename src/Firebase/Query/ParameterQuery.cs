@@ -1,23 +1,25 @@
 namespace Firebase.Database.Query
 {
+    using System;
+
     /// <summary>
     /// Represents a parameter in firebase query, e.g. "?data=foo".
     /// </summary>
     public abstract class ParameterQuery : FirebaseQuery
     {
-        private readonly string parameter;
+        private readonly Func<string> parameterFactory;
         private readonly string separator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterQuery"/> class.
         /// </summary>
         /// <param name="parent"> The parent of this query. </param>
-        /// <param name="parameter"> The parameter. </param>
+        /// <param name="parameterFactory"> The parameter. </param>
         /// <param name="client"> The owning client. </param>
-        protected ParameterQuery(FirebaseQuery parent, string parameter, FirebaseClient client)
+        protected ParameterQuery(FirebaseQuery parent, Func<string> parameterFactory, FirebaseClient client)
             : base(parent, client)
         {
-            this.parameter = parameter;
+            this.parameterFactory = parameterFactory;
             this.separator = (this.Parent is ChildQuery) ? "?" : "&";
         }
 
@@ -28,7 +30,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="string"/>. </returns>
         protected override string BuildUrlSegment(FirebaseQuery child)
         {
-            return $"{this.separator}{this.parameter}={this.BuildUrlParameter(child)}";
+            return $"{this.separator}{this.parameterFactory()}={this.BuildUrlParameter(child)}";
         }
 
         /// <summary>

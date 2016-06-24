@@ -45,7 +45,7 @@ namespace Firebase.Database
         /// <returns> <see cref="ChildQuery"/>. </returns>
         public ChildQuery Child(string resourceName)
         {
-            return new ChildQuery(this.baseUrl + resourceName, this);
+            return new ChildQuery(this, () => this.baseUrl + resourceName);
         }
     }
 }
