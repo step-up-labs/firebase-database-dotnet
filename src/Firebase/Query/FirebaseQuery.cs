@@ -97,11 +97,13 @@ namespace Firebase.Database.Query
             return this.BuildUrl(null);
         }
 
-        public void Dispose()
-        {
-            this.client?.Dispose();
-        }
-
+        /// <summary>
+        /// Posts given object to repository.
+        /// </summary>
+        /// <param name="obj"> The object. </param> 
+        /// <param name="generateKeyOffline"> Specifies whether the key should be generated offline instead of online. </param> 
+        /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
+        /// <returns> Resulting firebase object with populated key. </returns>
         public async Task<FirebaseObject<T>> PostAsync<T>(T obj, bool generateKeyOffline = true)
         {
             // post generates a new key server-side, while put can be used with an already generated local key
@@ -122,6 +124,12 @@ namespace Firebase.Database.Query
             }
         }
 
+        /// <summary>
+        /// Patches data at given location instead of overwriting them. 
+        /// </summary> 
+        /// <param name="obj"> The object. </param>  
+        /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
+        /// <returns> The <see cref="Task"/>. </returns>
         public async Task PatchAsync<T>(T obj)
         {
             var c = this.GetClient();
@@ -129,6 +137,12 @@ namespace Firebase.Database.Query
             await this.SendAsync(c, obj, new HttpMethod("PATCH")).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Sets or overwrites data at given location. 
+        /// </summary> 
+        /// <param name="obj"> The object. </param>  
+        /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
+        /// <returns> The <see cref="Task"/>. </returns>
         public async Task PutAsync<T>(T obj)
         {
             var c = this.GetClient();
@@ -136,6 +150,10 @@ namespace Firebase.Database.Query
             await this.SendAsync(c, obj, HttpMethod.Put).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Deletes data from given location.
+        /// </summary>
+        /// <returns> The <see cref="Task"/>. </returns>
         public async Task DeleteAsync()
         {
             var c = this.GetClient();
@@ -143,6 +161,14 @@ namespace Firebase.Database.Query
             var result = await c.DeleteAsync(url).ConfigureAwait(false);
 
             result.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Disposes this instance.  
+        /// </summary>
+        public void Dispose()
+        {
+            this.client?.Dispose();
         }
 
         /// <summary>
