@@ -111,7 +111,7 @@ namespace Firebase.Database.Query
             if (generateKeyOffline)
             {
                 var key = FirebaseKeyGenerator.Next();
-                await new ChildQuery(this.Parent, () => key, this.Client).PutAsync(obj).ConfigureAwait(false);
+                await new ChildQuery(this, () => key, this.Client).PutAsync(obj).ConfigureAwait(false);
 
                 return new FirebaseObject<T>(key, obj);
             }
