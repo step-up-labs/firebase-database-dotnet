@@ -116,7 +116,7 @@ namespace Firebase.Database.Streaming
 
                 foreach (var item in objectCollection)
                 {
-                    dictionary.Add(item.Key, item.Object);
+                    dictionary[item.Key] = item.Object;
                     yield return new FirebaseObject<T>(item.Key, (T)item.Object);
                 }
             }
@@ -135,7 +135,8 @@ namespace Firebase.Database.Streaming
                 {
                     JsonConvert.PopulateObject(data, obj);
                 }
-            
+
+                this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
                 yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
             }
         }

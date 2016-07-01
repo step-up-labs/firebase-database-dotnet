@@ -1,0 +1,83 @@
+﻿namespace Firebase.Database.Offline
+{
+    using System;
+
+    using Newtonsoft.Json;
+
+    /// <summary>
+    /// Represents an object stored in offline storage.
+    /// </summary>
+    public class OfflineEntry
+    {
+        private object dataInstance;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OfflineEntry"/> class.
+        /// </summary>
+        /// <param name="key"> The key. </param>
+        /// <param name="obj"> The object. </param>
+        /// <param name="syncOptions"> The sync options. </param>
+        public OfflineEntry(string key, object obj, SyncOptions syncOptions = SyncOptions.Push)
+        {
+            this.Key = key;
+            this.Data = JsonConvert.SerializeObject(obj);
+            this.Timestamp = DateTime.UtcNow;
+            this.SyncOptions = syncOptions;
+
+            this.dataInstance = obj;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OfflineEntry"/> class.
+        /// </summary>
+        public OfflineEntry() 
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets the key of this entry.
+        /// </summary>
+        public string Key
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the timestamp when this entry was last touched.
+        /// </summary>
+        public DateTime Timestamp
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="SyncOptions"/> which define what sync state this entry is in.
+        /// </summary>
+        public SyncOptions SyncOptions
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets serialized JSON data. 
+        /// </summary>
+        public string Data
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Deserializes <see cref="Data"/> into <typeparamref name="T"/>. The result is cached.
+        /// </summary>
+        /// <typeparam name="T"> Type of object to deserialize into. </typeparam>
+        /// <returns> Instance of <typeparamref name="T"/>. </returns>
+        public T Deserialize<T>()
+        {
+            return (T)(this.dataInstance ?? (this.dataInstance = JsonConvert.DeserializeObject<T>(this.Data)));
+        }
+    }
+}

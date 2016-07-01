@@ -28,15 +28,16 @@ namespace Firebase.Database.Streaming
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseSubscription{T}"/> class.
         /// </summary>
-        /// <param name="observer"> The observer. </param>
-        /// <param name="query"> The query. </param>
-        public FirebaseSubscription(IObserver<FirebaseEvent<T>> observer, IFirebaseQuery query)
+        /// <param name="observer"> The observer.  </param>
+        /// <param name="query"> The query.  </param>
+        /// <param name="cache"> The cache. </param>
+        public FirebaseSubscription(IObserver<FirebaseEvent<T>> observer, IFirebaseQuery query, FirebaseCache<T> cache)
         {
             this.observer = observer;
             this.query = query;
             this.cancel = new CancellationTokenSource();
             this.httpClient = new HttpClient();
-            this.cache = new FirebaseCache<T>();
+            this.cache = cache;
 
             var handler = new HttpClientHandler
             {

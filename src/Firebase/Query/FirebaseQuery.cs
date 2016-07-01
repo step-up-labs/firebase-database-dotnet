@@ -7,6 +7,7 @@ namespace Firebase.Database.Query
     using System.Threading.Tasks;
 
     using Firebase.Database.Http;
+    using Firebase.Database.Offline;
     using Firebase.Database.Streaming;
 
     using Newtonsoft.Json;
@@ -78,7 +79,7 @@ namespace Firebase.Database.Query
         /// <returns> Observable stream of <see cref="FirebaseEvent{T}"/>. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable<T>()
         {
-            return Observable.Create<FirebaseEvent<T>>(observer => new FirebaseSubscription<T>(observer, this).Run());
+            return Observable.Create<FirebaseEvent<T>>(observer => new FirebaseSubscription<T>(observer, this, new FirebaseCache<T>()).Run());
         }
 
         /// <summary>
