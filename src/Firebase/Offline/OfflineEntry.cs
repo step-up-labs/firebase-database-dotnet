@@ -16,10 +16,12 @@
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object. </param>
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param>  
         /// <param name="syncOptions"> The sync options. </param>
-        public OfflineEntry(string key, object obj, SyncOptions syncOptions = SyncOptions.Push)
+        public OfflineEntry(string key, object obj, int priority, SyncOptions syncOptions = SyncOptions.Push)
         {
             this.Key = key;
+            this.Priority = priority;
             this.Data = JsonConvert.SerializeObject(obj);
             this.Timestamp = DateTime.UtcNow;
             this.SyncOptions = syncOptions;
@@ -38,6 +40,15 @@
         /// Gets or sets the key of this entry.
         /// </summary>
         public string Key
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the priority. Objects with higher priority will be synced first. Lower number indicates higher priority. 
+        /// </summary>
+        public int Priority 
         {
             get;
             set;

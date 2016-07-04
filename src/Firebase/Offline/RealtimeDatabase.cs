@@ -45,7 +45,8 @@
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object to set. </param>
-        public void Put(string key, T obj)
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param>
+        public void Put(string key, T obj, int priority = 1)
         {
             if (this.database.ContainsKey(key))
             {
@@ -54,7 +55,7 @@
             }
             else
             {
-                this.SetAndRaise(key, new OfflineEntry(key, obj));
+                this.SetAndRaise(key, new OfflineEntry(key, obj, priority));
             }
         }
 
@@ -62,12 +63,13 @@
         /// Adds a new entity to the database.
         /// </summary>
         /// <param name="obj"> The object to add.  </param>
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param>
         /// <returns> The generated key for this object. </returns>
-        public string Post(T obj)
+        public string Post(T obj, int priority = 1)
         {
             var key = FirebaseKeyGenerator.Next();
 
-            this.SetAndRaise(key, new OfflineEntry(key, obj));
+            this.SetAndRaise(key, new OfflineEntry(key, obj, priority));
 
             return key;
         }
@@ -76,20 +78,22 @@
         /// Deletes the entity with the given key.
         /// </summary>
         /// <param name="key"> The key. </param>
-        public void Delete(string key)
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param> 
+        public void Delete(string key, int priority = 1)
         {
-            this.SetAndRaise(key, new OfflineEntry(key, null));
+            this.SetAndRaise(key, new OfflineEntry(key, null, priority));
         }
 
         /// <summary>
         /// Fetches an object with the given key and adds it to the database.
         /// </summary>
         /// <param name="key"> The key. </param>
-        public void Pull(string key)
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param>
+        public void Pull(string key, int priority = 1)
         {
             if (!this.database.ContainsKey(key))
             {
-                this.database[key] = new OfflineEntry(key, null, SyncOptions.Pull);
+                this.database[key] = new OfflineEntry(key, null, priority, SyncOptions.Pull);
             }
             else
             {
@@ -141,7 +145,7 @@
                 try
                 {
                     var validEntries = this.database.Where(e => e.Value != null);
-                    await this.PullEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Pull).Select(kvp => kvp.Key));
+                    await this.PullEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Pull));
                     await this.PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Push));
                 }
                 catch (Exception ex)
@@ -160,22 +164,32 @@
 
         private async Task PushEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pushEntries)
         {
-            var tasks = pushEntries.Select(kvp => this.childQuery.Child(kvp.Key).PutAsync(kvp.Value.Deserialize<T>())).ToList();
+            var groups = pushEntries.GroupBy(pair => pair.Value.Priority);
 
-            await Task.WhenAll(tasks);
+            foreach (var group in groups)
+            {
+                var tasks = group.Select(kvp => this.childQuery.Child(kvp.Key).PutAsync(kvp.Value.Deserialize<T>())).ToList();
 
-            this.ResetSyncOptions(pushEntries.Select(s => s.Key));
+                await Task.WhenAll(tasks);
+
+                this.ResetSyncOptions(group.Select(s => s.Key));
+            }
         }
 
-        private async Task PullEntriesAsync(IEnumerable<string> pullEntries)
+        private async Task PullEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pullEntries)
         {
-            var tasks = pullEntries.Select(key => new { Key = key, Task = this.childQuery.Child(key).OnceSingleAsync<T>() }).ToList();
+            var taskGroups = pullEntries.GroupBy(pair => pair.Value.Priority).OrderBy(g => g.Key);
 
-            await Task.WhenAll(tasks.Select(t => t.Task));
-
-            foreach (var task in tasks)
+            foreach (var group in taskGroups)
             {
-                this.SetAndRaise(task.Key, new OfflineEntry(task.Key, task.Task.Result, SyncOptions.None));
+                var tasks = group.Select(pair => new { Key = pair.Key, Task = this.childQuery.Child(pair.Key).OnceSingleAsync<T>(), Priority = pair.Value.Priority }).ToList();
+
+                await Task.WhenAll(tasks.Select(t => t.Task));
+
+                foreach (var task in tasks)
+                {
+                    this.SetAndRaise(task.Key, new OfflineEntry(task.Key, task.Task.Result, task.Priority, SyncOptions.None));
+                }
             }
         }
 
