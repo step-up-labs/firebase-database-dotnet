@@ -47,6 +47,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Http\HttpClientExtensions.cs" />
     <Compile Include="Http\PostResult.cs" />
+    <Compile Include="Offline\ExceptionEventArgs.cs" />
     <Compile Include="Offline\OfflineCacheAdapter.cs" />
     <Compile Include="Offline\OfflineEntry.cs" />
     <Compile Include="Offline\RealtimeDatabase.cs" />

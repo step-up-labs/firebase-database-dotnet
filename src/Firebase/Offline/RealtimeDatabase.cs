@@ -41,6 +41,11 @@
         }
 
         /// <summary>
+        /// Event raised whenever an exception is thrown in the synchronization thread. Exception thrown in there are swallowed, so this event is the only way to get to them. 
+        /// </summary>
+        public event EventHandler<ExceptionEventArgs> SyncExceptionThrown;
+
+        /// <summary>
         /// Overwrites existing object with given key.
         /// </summary>
         /// <param name="key"> The key. </param>
@@ -150,7 +155,7 @@
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex);
+                    this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
                 }
 
                 await Task.Delay(1000);
