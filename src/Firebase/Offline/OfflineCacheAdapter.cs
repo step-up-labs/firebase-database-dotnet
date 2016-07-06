@@ -36,7 +36,7 @@
 
             set
             {
-                this.database[key.ToString()] = new OfflineEntry(key.ToString(), value, SyncOptions.None);
+                this.database[key.ToString()] = new OfflineEntry(key.ToString(), value, 1, SyncOptions.None);
             }
         }
 
@@ -57,7 +57,7 @@
 
             set
             {
-                this.database[key] = new OfflineEntry(key, value, SyncOptions.None);
+                this.database[key] = new OfflineEntry(key, value, 1, SyncOptions.None);
             }
         }
 
@@ -120,7 +120,7 @@
 
         public void Add(string key, T value)
         {
-            this.database.Add(key, new OfflineEntry(key, value, SyncOptions.None));
+            this.database.Add(key, new OfflineEntry(key, value, 1, SyncOptions.None));
         }
 
         public bool ContainsKey(string key)
