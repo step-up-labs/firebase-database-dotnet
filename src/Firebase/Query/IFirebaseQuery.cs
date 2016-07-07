@@ -23,7 +23,7 @@
         /// </summary>
         /// <typeparam name="T"> Type of the items. </typeparam>
         /// <returns> Cold observable of <see cref="FirebaseEvent{T}"/>. </returns>
-        IObservable<FirebaseEvent<T>> AsObservable<T>();
+        IObservable<FirebaseEvent<T>> AsObservable<T>(string elementRoot = "");
 
         /// <summary>
         /// Builds the actual url of this query.

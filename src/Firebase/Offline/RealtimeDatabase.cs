@@ -22,9 +22,10 @@
         private readonly bool streamChanges;
         private readonly IDictionary<string, OfflineEntry> database;
         private readonly Subject<FirebaseEvent<T>> subject;
+        private readonly string elementRoot;
 
         private IDisposable subscription;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RealtimeDatabase{T}"/> class.
         /// </summary>
@@ -32,9 +33,10 @@
         /// <param name="offlineDatabaseFactory"> The offline database factory. </param>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param> 
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server. </param> 
-        public RealtimeDatabase(ChildQuery childQuery, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges)
+        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges)
         {
             this.childQuery = childQuery;
+            this.elementRoot = elementRoot;
             this.streamChanges = streamChanges;
             this.subject = new Subject<FirebaseEvent<T>>();
             this.database = offlineDatabaseFactory(typeof(T), filenameModifier);
@@ -138,7 +140,7 @@
 
             if (this.streamChanges)
             { 
-                this.subscription = new FirebaseSubscription<T>(this.subject, this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey()), new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.database))).Run();
+                this.subscription = new FirebaseSubscription<T>(this.subject, this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey()), this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.database))).Run();
             }
             else
             {

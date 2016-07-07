@@ -24,6 +24,7 @@ namespace Firebase.Database.Streaming
         private readonly IObserver<FirebaseEvent<T>> observer;
         private readonly IFirebaseQuery query;
         private readonly FirebaseCache<T> cache;
+        private readonly string elementRoot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseSubscription{T}"/> class.
@@ -31,10 +32,11 @@ namespace Firebase.Database.Streaming
         /// <param name="observer"> The observer.  </param>
         /// <param name="query"> The query.  </param>
         /// <param name="cache"> The cache. </param>
-        public FirebaseSubscription(IObserver<FirebaseEvent<T>> observer, IFirebaseQuery query, FirebaseCache<T> cache)
+        public FirebaseSubscription(IObserver<FirebaseEvent<T>> observer, IFirebaseQuery query, string elementRoot, FirebaseCache<T> cache)
         {
             this.observer = observer;
             this.query = query;
+            this.elementRoot = elementRoot;
             this.cancel = new CancellationTokenSource();
             this.httpClient = new HttpClient();
             this.cache = cache;
@@ -165,7 +167,7 @@ namespace Firebase.Database.Streaming
                     var data = result["data"].ToString();
                     var eventType = string.IsNullOrWhiteSpace(data) ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate;
 
-                    var items = this.cache.PushData(path, data);
+                    var items = this.cache.PushData(this.elementRoot + path, data);
 
                     foreach (var i in items.ToList())
                     {

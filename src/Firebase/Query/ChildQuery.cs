@@ -38,11 +38,12 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
+        /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server. </param> 
         /// <returns> The <see cref="RealtimeDatabase{T}"/>. </returns>
-        public RealtimeDatabase<T> AsRealtimeDatabase<T>(string filenameModifier, bool streamChanges = true) where T : class
+        public RealtimeDatabase<T> AsRealtimeDatabase<T>(string filenameModifier, string elementRoot = "", bool streamChanges = true) where T : class
         {
-            return new RealtimeDatabase<T>(this, this.Client.OfflineDatabaseFactory, filenameModifier, streamChanges);
+            return new RealtimeDatabase<T>(this, elementRoot, this.Client.OfflineDatabaseFactory, filenameModifier, streamChanges);
         }
 
         /// <summary>
