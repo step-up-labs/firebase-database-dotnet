@@ -15,7 +15,7 @@
 		<tags>Firebase Database Realtime</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="8.0.3" />
-      <dependency id="Rx-Main" version="2.2.5" />
+      <dependency id="System.Reactive" version="3.0.0" />
     </dependencies>
 	</metadata>
 </package>
