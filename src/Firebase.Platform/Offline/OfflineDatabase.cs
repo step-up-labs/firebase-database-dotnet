@@ -6,7 +6,7 @@
     using System.Linq;
 
     using Lex.Db;
-
+    
     /// <summary>
     /// The offline database.
     /// </summary>
@@ -22,7 +22,7 @@
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
         public OfflineDatabase(Type itemType, string filenameModifier)
         {
-            this.db = new DbInstance(itemType.AssemblyQualifiedName + filenameModifier);
+            this.db = new DbInstance(this.GetFileName(itemType.FullName) + filenameModifier);
             this.db.Map<OfflineEntry>().Automap(o => o.Key);
             this.db.Initialize();
 
@@ -173,6 +173,16 @@
         public bool TryGetValue(string key, out OfflineEntry value) 
         {
             return this.cache.TryGetValue(key, out value);
+        }
+
+        private string GetFileName(string fileName)
+        {
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                fileName = fileName.Replace(c, '_');
+            }
+
+            return fileName;
         }
     }
 }
