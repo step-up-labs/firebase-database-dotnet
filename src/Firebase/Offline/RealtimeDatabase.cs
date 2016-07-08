@@ -52,7 +52,7 @@
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object to set. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param>
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         public void Put(string key, T obj, int priority = 1)
         {
             if (this.database.ContainsKey(key))
@@ -70,7 +70,7 @@
         /// Adds a new entity to the database.
         /// </summary>
         /// <param name="obj"> The object to add.  </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param>
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         /// <returns> The generated key for this object. </returns>
         public string Post(T obj, int priority = 1)
         {
@@ -85,7 +85,7 @@
         /// Deletes the entity with the given key.
         /// </summary>
         /// <param name="key"> The key. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param> 
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
         public void Delete(string key, int priority = 1)
         {
             this.SetAndRaise(key, new OfflineEntry(key, null, priority));
@@ -95,7 +95,7 @@
         /// Fetches an object with the given key and adds it to the database.
         /// </summary>
         /// <param name="key"> The key. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Lower number indicates higher priority. </param>
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         public void Pull(string key, int priority = 1)
         {
             if (!this.database.ContainsKey(key))
@@ -171,7 +171,7 @@
 
         private async Task PushEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pushEntries)
         {
-            var groups = pushEntries.GroupBy(pair => pair.Value.Priority);
+            var groups = pushEntries.GroupBy(pair => pair.Value.Priority).OrderByDescending(kvp => kvp.Key);
 
             foreach (var group in groups)
             {
@@ -185,7 +185,7 @@
 
         private async Task PullEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pullEntries)
         {
-            var taskGroups = pullEntries.GroupBy(pair => pair.Value.Priority).OrderBy(g => g.Key);
+            var taskGroups = pullEntries.GroupBy(pair => pair.Value.Priority).OrderByDescending(kvp => kvp.Key);
 
             foreach (var group in taskGroups)
             {
