@@ -55,7 +55,7 @@ namespace Firebase.Database.Query
         {
             var s = this.pathFactory();
 
-            if (!s.EndsWith("/"))
+            if (s != string.Empty && !s.EndsWith("/"))
             {
                 s += '/';
             }

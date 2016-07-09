@@ -40,6 +40,8 @@
             this.streamChanges = streamChanges;
             this.subject = new Subject<FirebaseEvent<T>>();
             this.database = offlineDatabaseFactory(typeof(T), filenameModifier);
+
+            Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         /// <summary>
@@ -114,7 +116,7 @@
         /// <returns> Stream of <see cref="FirebaseEvent{T}"/>. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable()
         {
-            Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            this.InitializeStreamingSubscription();
 
             var initialData = this.database
                 .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
@@ -125,6 +127,24 @@
             return initialData.Concat(this.subject); 
         }
 
+        private void InitializeStreamingSubscription()
+        {
+            if (this.subscription != null)
+            {
+                return;
+            }
+
+            if (this.streamChanges)
+            {
+                this.subscription = new FirebaseSubscription<T>(this.subject, this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey()), this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.database))).Run();
+            }
+            else
+            {
+                this.subscription = Observable.Empty<string>().Subscribe(); // just a dummy IDisposable
+            }
+
+        }
+
         private void SetAndRaise(string key, OfflineEntry obj)
         {
             this.database[key] = obj;
@@ -133,20 +153,6 @@
 
         private async void SynchronizeThread()
         {
-            if (this.subscription != null)
-            {
-                return;
-            }
-
-            if (this.streamChanges)
-            { 
-                this.subscription = new FirebaseSubscription<T>(this.subject, this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey()), this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.database))).Run();
-            }
-            else
-            {
-                this.subscription = Observable.Empty<string>().Subscribe(); // just a dummy IDisposable
-            }
-
             while (true)
             {
                 try
