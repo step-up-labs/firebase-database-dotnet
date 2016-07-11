@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firebase", "Firebase\Fireba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firebase.Platform", "Firebase.Platform\Firebase.Platform.csproj", "{44931BF4-716F-4373-A606-DFDE042C784C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firebase.Console", "Firebase.Console\Firebase.Console.csproj", "{9EF330A9-A498-4A28-A460-C276FD136845}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{44931BF4-716F-4373-A606-DFDE042C784C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44931BF4-716F-4373-A606-DFDE042C784C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44931BF4-716F-4373-A606-DFDE042C784C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9EF330A9-A498-4A28-A460-C276FD136845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9EF330A9-A498-4A28-A460-C276FD136845}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9EF330A9-A498-4A28-A460-C276FD136845}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9EF330A9-A498-4A28-A460-C276FD136845}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
