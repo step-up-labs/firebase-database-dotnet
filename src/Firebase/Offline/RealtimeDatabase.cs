@@ -23,8 +23,8 @@
         private readonly string elementRoot;
         private readonly Subject<FirebaseEvent<T>> subject;
 
-        private IDisposable subscription;
-        
+        private IObservable<FirebaseEvent<T>> observable;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RealtimeDatabase{T}"/> class.
         /// </summary>
@@ -116,26 +116,29 @@
         /// <returns> Stream of <see cref="FirebaseEvent{T}"/>. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable()
         {
-            var initialData = this.database
-                .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
-                .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate))
-                .ToList().ToObservable();
+            if (this.observable == null)
+            { 
+                var initialData = this.database
+                    .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
+                    .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate))
+                    .ToList().ToObservable();
 
-            return Observable
-                .Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))
-                .Merge(initialData)
-                .Merge(this.subject)
-                .Replay()
-                .RefCount();
+                this.observable = Observable
+                    .Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))
+                    .Merge(initialData)
+                    .Merge(this.subject)
+                    .Replay()
+                    .RefCount();
+            }
+
+            return this.observable;
         }   
 
         private IDisposable InitializeStreamingSubscription(IObserver<FirebaseEvent<T>> observer)
         {
-            this.subscription = this.streamChanges 
+            return this.streamChanges 
                 ? new FirebaseSubscription<T>(observer, this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey()), this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.database))).Run() 
                 : Observable.Never<string>().Subscribe();
-
-            return this.subscription;
         }
 
         private void SetAndRaise(string key, OfflineEntry obj)
