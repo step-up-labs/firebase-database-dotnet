@@ -79,7 +79,7 @@ namespace Firebase.Database.Streaming
                     // initialize network connection
                     var serverEvent = FirebaseServerEventType.KeepAlive;
                     var request = new HttpRequestMessage(HttpMethod.Get, await this.query.BuildUrlAsync().ConfigureAwait(false));
-                    var response = await this.httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                    var response = await this.httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, this.cancel.Token).ConfigureAwait(false);
 
                     response.EnsureSuccessStatusCode();
 
@@ -88,9 +88,9 @@ namespace Firebase.Database.Streaming
                     {
                         while (true)
                         {
-                            this.cancel.Token.ThrowIfCancellationRequested();
-
                             var line = reader.ReadLine();
+
+                            this.cancel.Token.ThrowIfCancellationRequested();
 
                             if (string.IsNullOrWhiteSpace(line))
                             {
