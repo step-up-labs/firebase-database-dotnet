@@ -52,5 +52,15 @@ namespace FireBase.Database.Tests
 
             path.Should().Be($"{BasePath}/resource/.json?orderBy=\"$key\"&startAt=\"{Token}\"&endAt=\"{Token}\"");
         }
+
+        [TestMethod]
+        public void OnlyChildPath()
+        {
+            var client = new FirebaseClient(BasePath);
+
+            var path = client.Child("resource").BuildUrlAsync().Result;
+
+            path.Should().Be($"{BasePath}/resource/.json");
+        }
     }
 }

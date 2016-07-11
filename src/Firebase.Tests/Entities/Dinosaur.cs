@@ -15,5 +15,8 @@
 
         [JsonProperty(PropertyName = "ds")]
         public Dimensions Dimensions { get; set; }
+
+        [JsonProperty(PropertyName = "weight")]
+        public double Weight { get; set; }
     }
 }
