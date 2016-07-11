@@ -11,6 +11,7 @@
 
     using Firebase.Database.Query;
     using Firebase.Database.Streaming;
+    using System.Reactive.Disposables;
 
     /// <summary>
     /// The real-time database which synchronizes online and offline data. 
@@ -116,15 +117,27 @@
         /// <returns> Stream of <see cref="FirebaseEvent{T}"/>. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable()
         {
-            this.InitializeStreamingSubscription();
-
             var initialData = this.database
                 .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
                 .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate))
-                .ToList()
-                .ToObservable();
+                .ToList().ToObservable();
 
-            return initialData.Concat(this.subject); 
+            /*var id = Observable.Create<FirebaseEvent<T>>(observer =>
+            {
+                foreach (var item in initialData)
+                {
+                    observer.OnNext(item);
+                }
+
+                observer.OnCompleted();
+
+                return Disposable.Empty;
+            });*/
+
+            return Observable
+                .Empty<FirebaseEvent<T>>().Finally(() => this.InitializeStreamingSubscription())
+                .Concat(initialData)
+                .Concat(this.subject).Publish().RefCount();//.Finally(() => this.subscription.Dispose()); 
         }
 
         private void InitializeStreamingSubscription()
@@ -140,9 +153,8 @@
             }
             else
             {
-                this.subscription = Observable.Empty<string>().Subscribe(); // just a dummy IDisposable
+                this.subscription = Observable.Never<string>().Subscribe(); // just a dummy IDisposable
             }
-
         }
 
         private void SetAndRaise(string key, OfflineEntry obj)
