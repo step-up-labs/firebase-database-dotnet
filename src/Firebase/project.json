@@ -1,7 +1,6 @@
 ﻿{
   "supports": {},
   "dependencies": {
-    "AutoMapper": "3.3.0",
     "Newtonsoft.Json": "8.0.3",
     "Rx-main": "2.2.5"
   },
