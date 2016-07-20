@@ -57,15 +57,7 @@
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         public void Put(string key, T obj, int priority = 1)
         {
-            if (this.database.ContainsKey(key))
-            {
-                this.database[key].SyncOptions = SyncOptions.Push;
-                this.SetAndRaise(key, this.database[key]);
-            }
-            else
-            {
-                this.SetAndRaise(key, new OfflineEntry(key, obj, priority));
-            }
+            this.SetAndRaise(key, new OfflineEntry(key, obj, priority));
         }
 
         /// <summary>
