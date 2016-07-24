@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>FirebaseDatabase.net</id>
-		<version>2.0.0-alpha2</version>
+		<version>2.0.0-alpha3</version>
 		<title>FirebaseDatabase.net</title>
 		<authors>Step Up Labs, Inc.</authors>
 		<owners>Step Up Labs, Inc.</owners>
@@ -10,12 +10,22 @@
     <licenseUrl>https://github.com/step-up-labs/firebase-database-dotnet/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/step-up-labs/firebase-database-dotnet</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Wrapper on top of Firebase Realtime Database REST API. Among others it supports streaming API which you can use for realtime notifications. It also supports offline storage. </description>
+		<description>
+      Complex C# library for Firebase Realtime Database built on top of Firebase REST API. Among others it supports following:
+      
+      * Offline storage
+      * Querying using available filters
+      * Passing in authentication token
+      * Streaming online changes
+      * Directly Posting / Putting / Patching online data
+      
+      Streaming changes (both online and offline) are done using Reactive Extensions.
+    </description>
 		<copyright>Step Up Labs, Inc. 2016</copyright>
 		<tags>Firebase Database Realtime</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="8.0.3" />
-      <dependency id="Rx-main" version="2.2.5" />
+      <dependency id="System.Reactive" version="3.0.0" />
     </dependencies>
 	</metadata>
 </package>
