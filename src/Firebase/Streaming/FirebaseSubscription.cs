@@ -171,7 +171,7 @@ namespace Firebase.Database.Streaming
 
                     foreach (var i in items.ToList())
                     {
-                        this.observer.OnNext(new FirebaseEvent<T>(i.Key, i.Object, eventType));
+                        this.observer.OnNext(new FirebaseEvent<T>(i.Key, i.Object, eventType, FirebaseEventSource.Online));
                     }
 
                     break;

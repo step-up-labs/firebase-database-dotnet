@@ -54,23 +54,25 @@
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object to set. </param>
+        /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
-        public void Put(string key, T obj, int priority = 1)
+        public void Put(string key, T obj, bool syncOnline = true, int priority = 1)
         {
-            this.SetAndRaise(key, new OfflineEntry(key, obj, priority));
+            this.SetAndRaise(key, new OfflineEntry(key, obj, priority, syncOnline ? SyncOptions.Push : SyncOptions.None));
         }
 
         /// <summary>
         /// Adds a new entity to the database.
         /// </summary>
         /// <param name="obj"> The object to add.  </param>
+        /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         /// <returns> The generated key for this object. </returns>
-        public string Post(T obj, int priority = 1)
+        public string Post(T obj, bool syncOnline = true, int priority = 1)
         {
             var key = FirebaseKeyGenerator.Next();
 
-            this.SetAndRaise(key, new OfflineEntry(key, obj, priority));
+            this.SetAndRaise(key, new OfflineEntry(key, obj, priority, syncOnline ? SyncOptions.Push : SyncOptions.None));
 
             return key;
         }
@@ -79,10 +81,11 @@
         /// Deletes the entity with the given key.
         /// </summary>
         /// <param name="key"> The key. </param>
+        /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
-        public void Delete(string key, int priority = 1)
+        public void Delete(string key, bool syncOnline = true, int priority = 1)
         {
-            this.SetAndRaise(key, new OfflineEntry(key, null, priority));
+            this.SetAndRaise(key, new OfflineEntry(key, null, priority, syncOnline ? SyncOptions.Push : SyncOptions.None));
         }
 
         /// <summary>
@@ -112,7 +115,7 @@
             { 
                 var initialData = this.database
                     .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
-                    .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate))
+                    .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline))
                     .ToList().ToObservable();
 
                 this.observable = Observable
@@ -133,10 +136,10 @@
                 : Observable.Never<string>().Subscribe();
         }
 
-        private void SetAndRaise(string key, OfflineEntry obj)
+        private void SetAndRaise(string key, OfflineEntry obj, FirebaseEventSource eventSource = FirebaseEventSource.Offline)
         {
             this.database[key] = obj;
-            this.subject.OnNext(new FirebaseEvent<T>(key, obj?.Deserialize<T>(), string.IsNullOrEmpty(obj?.Data) ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate));
+            this.subject.OnNext(new FirebaseEvent<T>(key, obj?.Deserialize<T>(), string.IsNullOrEmpty(obj?.Data) ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, eventSource));
         }
 
         private async void SynchronizeThread()
@@ -189,7 +192,7 @@
 
                 foreach (var task in tasks)
                 {
-                    this.SetAndRaise(task.Key, new OfflineEntry(task.Key, task.Task.Result, task.Priority, SyncOptions.None));
+                    this.SetAndRaise(task.Key, new OfflineEntry(task.Key, task.Task.Result, task.Priority, SyncOptions.None), FirebaseEventSource.Online);
                 }
             }
         }
