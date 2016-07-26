@@ -12,19 +12,19 @@
     using Firebase.Database.Streaming;
 
     /// <summary>
-    /// The real-time database which synchronizes online and offline data. 
+    /// The real-time Database which synchronizes online and offline data. 
     /// </summary>
     /// <typeparam name="T"> Type of entities. </typeparam>
     public partial class RealtimeDatabase<T> where T : class
     {
         private readonly ChildQuery childQuery;
         private readonly bool streamChanges;
-        private readonly IDictionary<string, OfflineEntry> database;
         private readonly string elementRoot;
         private readonly Subject<FirebaseEvent<T>> subject;
+        private readonly bool pullEverythingOnStart;
 
         private IObservable<FirebaseEvent<T>> observable;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RealtimeDatabase{T}"/> class.
         /// </summary>
@@ -33,12 +33,14 @@
         /// <param name="offlineDatabaseFactory"> The offline database factory.  </param>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name.  </param>
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server.  </param>
-        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges)
+        /// <param name="pullEverythingOnStart"> Specifies if everything should be pull from the online storage on start. It only makes sense when <see cref="streamChanges"/> is set to true. </param>
+        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, bool pullEverythingOnStart)
         {
             this.childQuery = childQuery;
             this.elementRoot = elementRoot;
             this.streamChanges = streamChanges;
-            this.database = offlineDatabaseFactory(typeof(T), filenameModifier);
+            this.pullEverythingOnStart = pullEverythingOnStart;
+            this.Database = offlineDatabaseFactory(typeof(T), filenameModifier);
             this.subject = new Subject<FirebaseEvent<T>>();
 
             Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
@@ -48,6 +50,15 @@
         /// Event raised whenever an exception is thrown in the synchronization thread. Exception thrown in there are swallowed, so this event is the only way to get to them. 
         /// </summary>
         public event EventHandler<ExceptionEventArgs> SyncExceptionThrown;
+
+        /// <summary>
+        /// Gets the backing Database.
+        /// </summary>
+        public IDictionary<string, OfflineEntry> Database
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Overwrites existing object with given key.
@@ -62,7 +73,7 @@
         }
 
         /// <summary>
-        /// Adds a new entity to the database.
+        /// Adds a new entity to the Database.
         /// </summary>
         /// <param name="obj"> The object to add.  </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
@@ -89,31 +100,31 @@
         }
 
         /// <summary>
-        /// Fetches an object with the given key and adds it to the database.
+        /// Fetches an object with the given key and adds it to the Database.
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         public void Pull(string key, int priority = 1)
         {
-            if (!this.database.ContainsKey(key))
+            if (!this.Database.ContainsKey(key))
             {
-                this.database[key] = new OfflineEntry(key, null, priority, SyncOptions.Pull);
+                this.Database[key] = new OfflineEntry(key, null, priority, SyncOptions.Pull);
             }
             else
             {
-                this.database[key].SyncOptions = SyncOptions.Pull;
+                this.Database[key].SyncOptions = SyncOptions.Pull;
             }
         }
 
         /// <summary> 
-        /// Starts observing the real-time database. Events will be fired both when change is done locally and remotely.
+        /// Starts observing the real-time Database. Events will be fired both when change is done locally and remotely.
         /// </summary> 
         /// <returns> Stream of <see cref="FirebaseEvent{T}"/>. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable()
         {
             if (this.observable == null)
             { 
-                var initialData = this.database
+                var initialData = this.Database
                     .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
                     .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline))
                     .ToList().ToObservable();
@@ -131,14 +142,18 @@
 
         private IDisposable InitializeStreamingSubscription(IObserver<FirebaseEvent<T>> observer)
         {
-            return this.streamChanges 
-                ? new FirebaseSubscription<T>(observer, this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey()), this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.database))).Run() 
-                : Observable.Never<string>().Subscribe();
+            if (this.streamChanges)
+            {
+                var query = this.pullEverythingOnStart ? (FirebaseQuery)this.childQuery : this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
+                return new FirebaseSubscription<T>(observer, query, this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.Database))).Run();
+            } 
+                
+            return Observable.Never<string>().Subscribe();
         }
 
         private void SetAndRaise(string key, OfflineEntry obj, FirebaseEventSource eventSource = FirebaseEventSource.Offline)
         {
-            this.database[key] = obj;
+            this.Database[key] = obj;
             this.subject.OnNext(new FirebaseEvent<T>(key, obj?.Deserialize<T>(), string.IsNullOrEmpty(obj?.Data) ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, eventSource));
         }
 
@@ -148,7 +163,7 @@
             {
                 try
                 {
-                    var validEntries = this.database.Where(e => e.Value != null);
+                    var validEntries = this.Database.Where(e => e.Value != null);
                     await this.PullEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Pull));
                     await this.PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Push));
                 }
@@ -163,7 +178,7 @@
 
         private string GetLatestKey()
         {
-            return this.database.OrderBy(o => o.Key, StringComparer.Ordinal).LastOrDefault().Key;
+            return this.Database.OrderBy(o => o.Key, StringComparer.Ordinal).LastOrDefault().Key;
         }
 
         private async Task PushEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pushEntries)
@@ -201,9 +216,9 @@
         {
             foreach (var key in entries)
             {
-                var item = this.database[key];
+                var item = this.Database[key];
                 item.SyncOptions = SyncOptions.None;
-                this.database[key] = item;
+                this.Database[key] = item;
             }
         }
     }
