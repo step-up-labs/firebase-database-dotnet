@@ -22,6 +22,7 @@
         private readonly string elementRoot;
         private readonly Subject<FirebaseEvent<T>> subject;
         private readonly bool pullEverythingOnStart;
+        private readonly bool pushChanges;
 
         private IObservable<FirebaseEvent<T>> observable;
         
@@ -34,12 +35,14 @@
         /// <param name="filenameModifier"> Custom string which will get appended to the file name.  </param>
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server.  </param>
         /// <param name="pullEverythingOnStart"> Specifies if everything should be pull from the online storage on start. It only makes sense when <see cref="streamChanges"/> is set to true. </param>
-        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, bool pullEverythingOnStart)
+        /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
+        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, bool pullEverythingOnStart, bool pushChanges)
         {
             this.childQuery = childQuery;
             this.elementRoot = elementRoot;
             this.streamChanges = streamChanges;
             this.pullEverythingOnStart = pullEverythingOnStart;
+            this.pushChanges = pushChanges;
             this.Database = offlineDatabaseFactory(typeof(T), filenameModifier);
             this.subject = new Subject<FirebaseEvent<T>>();
 
@@ -165,7 +168,11 @@
                 {
                     var validEntries = this.Database.Where(e => e.Value != null);
                     await this.PullEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Pull));
-                    await this.PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Push));
+
+                    if (this.pushChanges)
+                    {
+                        await this.PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Push));
+                    }
                 }
                 catch (Exception ex)
                 {
