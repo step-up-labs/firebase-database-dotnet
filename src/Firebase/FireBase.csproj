@@ -65,6 +65,7 @@
     <Compile Include="Query\QueryExtensions.cs" />
     <Compile Include="Streaming\FirebaseCache.cs" />
     <Compile Include="Streaming\FirebaseEvent.cs" />
+    <Compile Include="Streaming\FirebaseEventSource.cs" />
     <Compile Include="Streaming\FirebaseEventType.cs" />
     <Compile Include="Streaming\FirebaseServerEventType.cs" />
     <Compile Include="Streaming\FirebaseSubscription.cs" />
