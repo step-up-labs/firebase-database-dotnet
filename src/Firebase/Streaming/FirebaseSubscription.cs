@@ -2,7 +2,6 @@ namespace Firebase.Database.Streaming
 {
     using System;
     using System.Diagnostics;
-    using System.IO;
     using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -12,6 +11,7 @@ namespace Firebase.Database.Streaming
     using Firebase.Database.Query;
 
     using Newtonsoft.Json.Linq;
+    using System.Net;
 
     /// <summary>
     /// The firebase subscription.
@@ -20,11 +20,29 @@ namespace Firebase.Database.Streaming
     internal class FirebaseSubscription<T> : IDisposable
     {
         private readonly CancellationTokenSource cancel;
-        private readonly HttpClient httpClient;
         private readonly IObserver<FirebaseEvent<T>> observer;
         private readonly IFirebaseQuery query;
         private readonly FirebaseCache<T> cache;
         private readonly string elementRoot;
+        private readonly FirebaseClient client;
+
+        private static HttpClient http;
+
+        static FirebaseSubscription()
+        {
+            var handler = new HttpClientHandler
+            {
+                AllowAutoRedirect = true,
+                MaxAutomaticRedirections = 10,
+                CookieContainer = new CookieContainer()
+            };
+
+            var httpClient = new HttpClient(handler, true);
+
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+
+            http = httpClient;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseSubscription{T}"/> class.
@@ -38,26 +56,12 @@ namespace Firebase.Database.Streaming
             this.query = query;
             this.elementRoot = elementRoot;
             this.cancel = new CancellationTokenSource();
-            this.httpClient = new HttpClient();
             this.cache = cache;
-
-            var handler = new HttpClientHandler
-            {
-                AllowAutoRedirect = true,
-                MaxAutomaticRedirections = 10,
-            };
-
-            this.httpClient = new HttpClient(handler, true)
-            {
-                Timeout = TimeSpan.FromMilliseconds(Timeout.Infinite),
-            };
-
-            this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+            this.client = query.Client;
         }
 
         public void Dispose()
         {
-            this.httpClient.Dispose();
             this.cancel.Cancel();
         }
 
@@ -78,19 +82,20 @@ namespace Firebase.Database.Streaming
 
                     // initialize network connection
                     var serverEvent = FirebaseServerEventType.KeepAlive;
-                    var request = new HttpRequestMessage(HttpMethod.Get, await this.query.BuildUrlAsync().ConfigureAwait(false));
-                    var response = await this.httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, this.cancel.Token).ConfigureAwait(false);
+                    var url = await this.query.BuildUrlAsync().ConfigureAwait(false);
+                    var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    
+                    var client = this.GetHttpClient();
+                    var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, this.cancel.Token).ConfigureAwait(false);
 
                     response.EnsureSuccessStatusCode();
 
                     using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    using (var reader = new StreamReader(stream))
+                    using (var reader = this.client.Options.SubscriptionStreamReaderFactory(stream))
                     {
                         while (true)
                         {
                             var line = reader.ReadLine();
-
-                            this.cancel.Token.ThrowIfCancellationRequested();
 
                             if (string.IsNullOrWhiteSpace(line))
                             {
@@ -99,7 +104,7 @@ namespace Firebase.Database.Streaming
                             }
 
                             var tuple = line.Split(new[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
-
+                            
                             switch (tuple[0].ToLower())
                             {
                                 case "event":
@@ -186,6 +191,11 @@ namespace Firebase.Database.Streaming
                     this.Dispose();
                     throw new OperationCanceledException();
             }
+        }
+
+        private HttpClient GetHttpClient()
+        {
+            return http;
         }
     }
 }

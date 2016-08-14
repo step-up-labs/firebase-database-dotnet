@@ -44,11 +44,13 @@
     <Compile Include="FirebaseClient.cs" />
     <Compile Include="FirebaseKeyGenerator.cs" />
     <Compile Include="FirebaseObject.cs" />
+    <Compile Include="FirebaseOptions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Http\HttpClientExtensions.cs" />
     <Compile Include="Http\PostResult.cs" />
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="Offline\ExceptionEventArgs.cs" />
+    <Compile Include="Offline\InitialPullStrategy.cs" />
     <Compile Include="Offline\OfflineCacheAdapter.cs" />
     <Compile Include="Offline\OfflineEntry.cs" />
     <Compile Include="Offline\RealtimeDatabase.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="Streaming\FirebaseEventType.cs" />
     <Compile Include="Streaming\FirebaseServerEventType.cs" />
     <Compile Include="Streaming\FirebaseSubscription.cs" />
+    <Compile Include="Streaming\NonBlockingStreamReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

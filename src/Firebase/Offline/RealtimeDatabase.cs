@@ -10,6 +10,7 @@
 
     using Firebase.Database.Query;
     using Firebase.Database.Streaming;
+    using System.Reactive.Threading.Tasks;
 
     /// <summary>
     /// The real-time Database which synchronizes online and offline data. 
@@ -21,7 +22,7 @@
         private readonly bool streamChanges;
         private readonly string elementRoot;
         private readonly Subject<FirebaseEvent<T>> subject;
-        private readonly bool pullEverythingOnStart;
+        private readonly InitialPullStrategy initialPullStrategy;
         private readonly bool pushChanges;
 
         private IObservable<FirebaseEvent<T>> observable;
@@ -36,12 +37,12 @@
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server.  </param>
         /// <param name="pullEverythingOnStart"> Specifies if everything should be pull from the online storage on start. It only makes sense when <see cref="streamChanges"/> is set to true. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
-        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, bool pullEverythingOnStart, bool pushChanges)
+        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, InitialPullStrategy initialPullStrategy, bool pushChanges)
         {
             this.childQuery = childQuery;
             this.elementRoot = elementRoot;
             this.streamChanges = streamChanges;
-            this.pullEverythingOnStart = pullEverythingOnStart;
+            this.initialPullStrategy = initialPullStrategy;
             this.pushChanges = pushChanges;
             this.Database = offlineDatabaseFactory(typeof(T), filenameModifier);
             this.subject = new Subject<FirebaseEvent<T>>();
@@ -132,22 +133,51 @@
                     .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline))
                     .ToList().ToObservable();
 
-                this.observable = Observable
-                    .Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))
-                    .Merge(initialData)
+                this.observable = initialData
                     .Merge(this.subject)
+                    .Merge(this.GetInitialPullObservable()
+                            .Retry()
+                            .SelectMany(e => e)
+                            .Do(e => this.Database[e.Key] = new OfflineEntry(e.Key, e.Object, 1, SyncOptions.None))
+                            .Select(e => new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online))
+                            .Concat(Observable.Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))))
                     .Replay()
                     .RefCount();
             }
 
             return this.observable;
-        }   
+        }
+
+        private IObservable<IReadOnlyCollection<FirebaseObject<T>>> GetInitialPullObservable()
+        {
+            FirebaseQuery query;
+            switch (this.initialPullStrategy)
+            {
+                case InitialPullStrategy.MissingOnly:
+                    query = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
+                    break;
+                case InitialPullStrategy.Everything:
+                    query = this.childQuery;
+                    break;
+                case InitialPullStrategy.None:
+                default:
+                    return Observable.Empty<IReadOnlyCollection<FirebaseEvent<T>>>();
+            }
+
+            if (string.IsNullOrWhiteSpace(this.elementRoot))
+            {
+                return Observable.Defer(() => query.OnceAsync<T>().ToObservable());
+            }
+            
+            // there is an element root, which indicates the target location is not a collection but a single element
+            return Observable.Defer(async () => Observable.Return(await query.OnceSingleAsync<T>()).Select(e => new[] { new FirebaseObject<T>(this.elementRoot, e) }));
+        }
 
         private IDisposable InitializeStreamingSubscription(IObserver<FirebaseEvent<T>> observer)
         {
             if (this.streamChanges)
             {
-                var query = this.pullEverythingOnStart ? (FirebaseQuery)this.childQuery : this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
+                var query = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
                 return new FirebaseSubscription<T>(observer, query, this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.Database))).Run();
             } 
                 

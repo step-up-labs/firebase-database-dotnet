@@ -90,9 +90,9 @@ namespace Firebase.Database.Query
         public async Task<string> BuildUrlAsync()
         {
             // if token factory is present on the parent then use it to generate auth token
-            if (this.Client.AuthTokenAsyncFactory != null)
+            if (this.Client.Options.AuthTokenAsyncFactory != null)
             {
-                var token = await this.Client.AuthTokenAsyncFactory().ConfigureAwait(false);
+                var token = await this.Client.Options.AuthTokenAsyncFactory().ConfigureAwait(false);
                 return this.WithAuth(token).BuildUrl(null);
             }
 

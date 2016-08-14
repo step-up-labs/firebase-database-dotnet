@@ -12,8 +12,7 @@ namespace Firebase.Database
     /// </summary>
     public class FirebaseClient
     {
-        internal readonly Func<Type, string, IDictionary<string, OfflineEntry>> OfflineDatabaseFactory;
-        internal readonly Func<Task<string>> AuthTokenAsyncFactory;
+        internal readonly FirebaseOptions Options;
 
         private readonly string baseUrl;
 
@@ -21,18 +20,10 @@ namespace Firebase.Database
         /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
         /// </summary>
         /// <param name="baseUrl"> The base url. </param>
-        public FirebaseClient(string baseUrl) : this(baseUrl, (t, s) => new Dictionary<string, OfflineEntry>())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
-        /// </summary>
-        /// <param name="baseUrl"> The base url. </param>
         /// <param name="offlineDatabaseFactory"> Offline database. </param>  
-        public FirebaseClient(string baseUrl, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory)
+        public FirebaseClient(string baseUrl, FirebaseOptions options)
         {
-            this.OfflineDatabaseFactory = offlineDatabaseFactory;
+            this.Options = options;
 
             this.baseUrl = baseUrl;
 
@@ -40,28 +31,6 @@ namespace Firebase.Database
             {
                 this.baseUrl += "/";
             }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
-        /// </summary>
-        /// <param name="baseUrl"> The base url. </param>
-        /// <param name="authTokenAsyncFactory"> Factory which returns valid firebase auth token. </param>
-        public FirebaseClient(string baseUrl, Func<Task<string>> authTokenAsyncFactory) 
-            : this(baseUrl, authTokenAsyncFactory, (t, s) => new Dictionary<string, OfflineEntry>())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
-        /// </summary>
-        /// <param name="baseUrl"> The base url. </param>
-        /// <param name="authTokenAsyncFactory"> Factory which returns valid firebase auth token. </param>
-        /// <param name="offlineDatabaseFactory"> Offline database. </param>   
-        public FirebaseClient(string baseUrl, Func<Task<string>> authTokenAsyncFactory, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory) 
-            : this(baseUrl, offlineDatabaseFactory)
-        {
-            this.AuthTokenAsyncFactory = authTokenAsyncFactory;
         }
 
         /// <summary>

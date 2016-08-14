@@ -12,6 +12,14 @@
     public interface IFirebaseQuery
     {
         /// <summary>
+        /// Gets the owning client of this query.
+        /// </summary>
+        FirebaseClient Client
+        {
+            get;
+        }
+
+        /// <summary>
         /// Retrieves items which exist on the location specified by this query instance.
         /// </summary>
         /// <typeparam name="T"> Type of the items. </typeparam>
