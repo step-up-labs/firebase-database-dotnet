@@ -16,7 +16,7 @@ namespace FireBase.Database.Tests
         [TestMethod]
         public void TestAuthPath()
         {
-            var client = new FirebaseClient(BasePath);
+            var client = new FirebaseClient(BasePath, new FirebaseOptions());
 
             var path = client.Child("resource").WithAuth(Token).BuildUrlAsync().Result;
 
@@ -26,7 +26,7 @@ namespace FireBase.Database.Tests
         [TestMethod]
         public void TestNestedAuthPath()
         {
-            var client = new FirebaseClient(BasePath);
+            var client = new FirebaseClient(BasePath, new FirebaseOptions());
 
             var path = client.Child("resource").OrderByKey().WithAuth(Token).BuildUrlAsync().Result;
 
@@ -36,7 +36,7 @@ namespace FireBase.Database.Tests
         [TestMethod]
         public void TestClientAuthPath()
         {
-            var client = new FirebaseClient(BasePath, () => Task.FromResult(Token));
+            var client = new FirebaseClient(BasePath, new FirebaseOptions { AuthTokenAsyncFactory = () => Task.FromResult(Token) });
 
             var path = client.Child("resource").OrderByKey().BuildUrlAsync().Result;
 
@@ -46,7 +46,7 @@ namespace FireBase.Database.Tests
         [TestMethod]
         public void TestCaseSensitivePath()
         {
-            var client = new FirebaseClient(BasePath);
+            var client = new FirebaseClient(BasePath, new FirebaseOptions());
 
             var path = client.Child("resource").OrderByKey().StartAt(Token).EndAt(Token).BuildUrlAsync().Result;
 
@@ -56,7 +56,7 @@ namespace FireBase.Database.Tests
         [TestMethod]
         public void OnlyChildPath()
         {
-            var client = new FirebaseClient(BasePath);
+            var client = new FirebaseClient(BasePath, new FirebaseOptions());
 
             var path = client.Child("resource").BuildUrlAsync().Result;
 
