@@ -95,7 +95,7 @@ namespace Firebase.Database.Streaming
                     {
                         while (true)
                         {
-                            var line = reader.ReadLine();
+                            var line = reader.ReadLine()?.Trim();
 
                             if (string.IsNullOrWhiteSpace(line))
                             {

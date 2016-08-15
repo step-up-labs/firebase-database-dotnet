@@ -50,7 +50,7 @@
             if (newLine >= 0)
             {
                 var r = cachedData.Substring(0, newLine + 1);
-                cachedData.Remove(0, r.Length);
+                this.cachedData = cachedData.Remove(0, r.Length);
                 return r.Trim();
             }
 
