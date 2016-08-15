@@ -67,7 +67,7 @@ namespace Firebase.Database.Streaming
 
         public IDisposable Run()
         {
-            Task.Factory.StartNew(this.ReceiveThread);
+            Task.Run(() => this.ReceiveThread());
 
             return this;
         }
