@@ -43,7 +43,7 @@ namespace Firebase.Database.Query
         /// <param name="initialPullStrategy"> Specifies what strategy should be used for initial pulling of server data. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
         /// <returns> The <see cref="RealtimeDatabase{T}"/>. </returns>
-        public RealtimeDatabase<T> AsRealtimeDatabase<T>(string filenameModifier, string elementRoot = "", bool streamChanges = true, InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true) where T : class
+        public RealtimeDatabase<T> AsRealtimeDatabase<T>(string filenameModifier = "", string elementRoot = "", bool streamChanges = true, InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true) where T : class
         {
             return new RealtimeDatabase<T>(this, elementRoot, this.Client.Options.OfflineDatabaseFactory, filenameModifier, streamChanges, initialPullStrategy, pushChanges);
         }
