@@ -39,10 +39,12 @@
 
             var myKey = authorsDb.Post(new Author { Name = name });
 
-            var e = from author in authorsDb.AsObservable()
-                    from message in messagesDb.AsObservable()
-                    where author.Key == message.Object.Author
-                    select new { author, message };
+            var e = (from author in authorsDb.AsObservable()
+                     from message in messagesDb.AsObservable()
+                     where author.Key == message.Object.Author
+                     where author.Key != myKey
+                     select new { author, message }
+                    ).Distinct(pair => pair.author.Key + pair.message.Key);
 
             e.Subscribe(pair => Console.WriteLine($"{pair.author.Object.Name}: {pair.message.Object.Content}"));
 
