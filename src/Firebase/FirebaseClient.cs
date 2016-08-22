@@ -21,9 +21,9 @@ namespace Firebase.Database
         /// </summary>
         /// <param name="baseUrl"> The base url. </param>
         /// <param name="offlineDatabaseFactory"> Offline database. </param>  
-        public FirebaseClient(string baseUrl, FirebaseOptions options)
+        public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
-            this.Options = options;
+            this.Options = options ?? new FirebaseOptions();
 
             this.baseUrl = baseUrl;
 
