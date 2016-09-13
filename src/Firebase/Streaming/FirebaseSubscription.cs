@@ -170,6 +170,12 @@ namespace Firebase.Database.Streaming
                     var result = JObject.Parse(serverData);
                     var path = result["path"].ToString();
                     var data = result["data"].ToString();
+
+                    if (path == "/" && data == string.Empty)
+                    {
+                        return;
+                    }
+
                     var eventType = string.IsNullOrWhiteSpace(data) ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate;
 
                     var items = this.cache.PushData(this.elementRoot + path, data);
