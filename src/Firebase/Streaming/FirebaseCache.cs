@@ -124,7 +124,9 @@ namespace Firebase.Database.Streaming
             {
                 // set the data on a property of the given object
                 var valueType = obj.GetType();
-                var targetObject = JsonConvert.DeserializeObject(data, valueType);
+
+                // firebase sends strings without double quotes
+                var targetObject = valueType == typeof(string) ? data.ToString() : JsonConvert.DeserializeObject(data, valueType);
 
                 if ((valueType.GetTypeInfo().IsPrimitive || valueType == typeof(string)) && primitiveObjSetter != null)
                 {

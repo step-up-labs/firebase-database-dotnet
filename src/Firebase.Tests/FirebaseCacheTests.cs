@@ -215,10 +215,11 @@
             var entities = cache.PushData("/", strings).ToList();
             entities.ShouldBeEquivalentTo(stringDictionary);
 
-            entities = cache.PushData("/d", @"""d""").ToList();
+            // firebase sends strings without double quotes
+            entities = cache.PushData("/d", @"d").ToList();
             entities.First().ShouldBeEquivalentTo(new FirebaseObject<string>("d", "d"));
 
-            entities = cache.PushData("/c", @"""cc""").ToList();
+            entities = cache.PushData("/c", @"cc").ToList();
             entities.First().ShouldBeEquivalentTo(new FirebaseObject<string>("c", "cc"));
         }
 
