@@ -2,10 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Threading.Tasks;
 
     using Firebase.Database.Offline;
-    using System.IO;
+
+    using Newtonsoft.Json;
 
     public class FirebaseOptions
     {
@@ -13,6 +15,7 @@
         {
             this.OfflineDatabaseFactory = (t, s) => new Dictionary<string, OfflineEntry>();
             this.SubscriptionStreamReaderFactory = s => new StreamReader(s);
+            this.JsonSerializerSettings = new JsonSerializerSettings();
         }
 
         /// <summary>
@@ -37,6 +40,15 @@
         /// Gets or sets the factory for <see cref="TextReader"/> used for reading online streams. Default is <see cref="StreamReader"/>.
         /// </summary>
         public Func<Stream, TextReader> SubscriptionStreamReaderFactory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the json serializer settings.
+        /// </summary>
+        public JsonSerializerSettings JsonSerializerSettings
         {
             get;
             set;

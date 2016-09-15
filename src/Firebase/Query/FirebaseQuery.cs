@@ -207,7 +207,7 @@ namespace Firebase.Database.Query
             var url = await this.BuildUrlAsync().ConfigureAwait(false);
             var message = new HttpRequestMessage(method, url)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(obj))
+                Content = new StringContent(JsonConvert.SerializeObject(obj, this.Client.Options.JsonSerializerSettings))
             };
 
             var result = await client.SendAsync(message).ConfigureAwait(false);
