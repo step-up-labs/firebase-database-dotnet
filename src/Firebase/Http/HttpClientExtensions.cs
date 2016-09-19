@@ -23,15 +23,28 @@ namespace Firebase.Database.Http
         /// <returns> The <see cref="Task"/>. </returns>
         public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(this HttpClient client, string requestUri)
         {
-            var data = await client.GetStringAsync(requestUri).ConfigureAwait(false);
-            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, T>>(data);
+            var responseData = string.Empty;
 
-            if (dictionary == null)
+            try
             {
-                return new FirebaseObject<T>[0];
-            }
+                var response = await client.GetAsync(requestUri).ConfigureAwait(false);
+                responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            return dictionary.Select(item => new FirebaseObject<T>(item.Key, item.Value)).ToList();
+                response.EnsureSuccessStatusCode();
+
+                var dictionary = JsonConvert.DeserializeObject<Dictionary<string, T>>(responseData);
+
+                if (dictionary == null)
+                {
+                    return new FirebaseObject<T>[0];
+                }
+
+                return dictionary.Select(item => new FirebaseObject<T>(item.Key, item.Value)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException(requestUri, string.Empty, responseData, ex);
+            }
         }
 
         /// <summary>

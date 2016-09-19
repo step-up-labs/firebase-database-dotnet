@@ -49,10 +49,7 @@ namespace Firebase.Database.Query
         {
             var path = await this.BuildUrlAsync().ConfigureAwait(false);
 
-            using (var client = new HttpClient())
-            {
-                return await client.GetObjectCollectionAsync<T>(path).ConfigureAwait(false);
-            }
+            return await this.GetClient().GetObjectCollectionAsync<T>(path).ConfigureAwait(false);
         }
 
 
@@ -64,11 +61,20 @@ namespace Firebase.Database.Query
         public async Task<T> OnceSingleAsync<T>()
         {
             var path = await this.BuildUrlAsync().ConfigureAwait(false);
+            var responseData = string.Empty;
 
-            using (var client = new HttpClient())
+            try
             {
-                var data = await client.GetStringAsync(path).ConfigureAwait(false);
-                return JsonConvert.DeserializeObject<T>(data);
+                var response = await this.GetClient().GetAsync(path).ConfigureAwait(false);
+                responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+
+                return JsonConvert.DeserializeObject<T>(responseData);
+            }
+            catch(Exception ex)
+            {
+                throw new FirebaseException(path, string.Empty, responseData, ex);
             }
         }
 
@@ -160,9 +166,19 @@ namespace Firebase.Database.Query
         {
             var c = this.GetClient();
             var url = await this.BuildUrlAsync().ConfigureAwait(false);
-            var result = await c.DeleteAsync(url).ConfigureAwait(false);
+            var responseData = string.Empty;
 
-            result.EnsureSuccessStatusCode();
+            try
+            {
+                var result = await c.DeleteAsync(url).ConfigureAwait(false);
+                responseData = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                result.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException(url, string.Empty, responseData, ex);
+            }
         }
 
         /// <summary>
@@ -205,16 +221,27 @@ namespace Firebase.Database.Query
         private async Task<string> SendAsync<T>(HttpClient client, T obj, HttpMethod method)
         {
             var url = await this.BuildUrlAsync().ConfigureAwait(false);
+            var requestData = JsonConvert.SerializeObject(obj);
             var message = new HttpRequestMessage(method, url)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(obj))
+                Content = new StringContent(requestData)
             };
 
-            var result = await client.SendAsync(message).ConfigureAwait(false);
+            var responseData = string.Empty;
 
-            result.EnsureSuccessStatusCode();
+            try
+            {
+                var result = await client.SendAsync(message).ConfigureAwait(false);
+                responseData = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            return await result.Content.ReadAsStringAsync().ConfigureAwait(false);
+                result.EnsureSuccessStatusCode();
+
+                return responseData;
+            }
+            catch(Exception ex)
+            {
+                throw new FirebaseException(url, requestData, responseData, ex);
+            }
         }
     }
 }
