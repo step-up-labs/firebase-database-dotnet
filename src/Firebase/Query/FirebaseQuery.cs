@@ -221,7 +221,7 @@ namespace Firebase.Database.Query
         private async Task<string> SendAsync<T>(HttpClient client, T obj, HttpMethod method)
         {
             var url = await this.BuildUrlAsync().ConfigureAwait(false);
-            var requestData = JsonConvert.SerializeObject(obj);
+            var requestData = JsonConvert.SerializeObject(obj, this.Client.Options.JsonSerializerSettings);
             var message = new HttpRequestMessage(method, url)
             {
                 Content = new StringContent(requestData)
