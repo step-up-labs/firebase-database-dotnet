@@ -1,10 +1,10 @@
 ﻿namespace Firebase.ConsoleChat
 {
     using System;
-    using System.Reactive.Linq;
     using System.Threading.Tasks;
 
     using Firebase.Database;
+    using System.Reactive.Linq;
 
     public class Program
     {
@@ -24,7 +24,7 @@
             var client = new FirebaseClient("https://yourfirebase.firebaseio.com/");
             var child = client.Child("messages");
             
-            var observable = child.AsObservable<Message>();
+            var observable = child.AsObservable<InboundMessage>();
             
             // delete entire conversation list
             await child.DeleteAsync();
@@ -43,7 +43,7 @@
                     break;
                 }
 
-                await child.PostAsync(new Message { Author = name, Content = message });
+                await child.PostAsync(new OutboundMessage { Author = name, Content = message });
             }
 
             subscription.Dispose();
