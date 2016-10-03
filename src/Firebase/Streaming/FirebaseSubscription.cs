@@ -60,6 +60,8 @@ namespace Firebase.Database.Streaming
             this.client = query.Client;
         }
 
+        public event EventHandler<ExceptionEventArgs<FirebaseException>> ExceptionThrown;
+
         public void Dispose()
         {
             this.cancel.Cancel();
@@ -76,15 +78,18 @@ namespace Firebase.Database.Streaming
         {
             while (true)
             {
+                var url = string.Empty;
+                var line = string.Empty;
+
                 try
                 {
                     this.cancel.Token.ThrowIfCancellationRequested();
 
                     // initialize network connection
-                    var serverEvent = FirebaseServerEventType.KeepAlive;
-                    var url = await this.query.BuildUrlAsync().ConfigureAwait(false);
+                    url = await this.query.BuildUrlAsync().ConfigureAwait(false);
                     var request = new HttpRequestMessage(HttpMethod.Get, url);
-                    
+                    var serverEvent = FirebaseServerEventType.KeepAlive;
+
                     var client = this.GetHttpClient();
                     var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, this.cancel.Token).ConfigureAwait(false);
 
@@ -95,7 +100,7 @@ namespace Firebase.Database.Streaming
                     {
                         while (true)
                         {
-                            var line = reader.ReadLine()?.Trim();
+                            line = reader.ReadLine()?.Trim();
 
                             if (string.IsNullOrWhiteSpace(line))
                             {
@@ -129,9 +134,8 @@ namespace Firebase.Database.Streaming
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("************************************************************");
-                    Debug.WriteLine(ex.ToString());
-                    Debug.WriteLine("************************************************************");
+                    this.ExceptionThrown?.Invoke(this, new ExceptionEventArgs<FirebaseException>(new FirebaseException(url, string.Empty, line, ex)));
+
                     await Task.Delay(2000).ConfigureAwait(false);
                 }
             }

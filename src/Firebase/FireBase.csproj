@@ -50,7 +50,7 @@
     <Compile Include="Http\HttpClientExtensions.cs" />
     <Compile Include="Http\PostResult.cs" />
     <Compile Include="ObservableExtensions.cs" />
-    <Compile Include="Offline\ExceptionEventArgs.cs" />
+    <Compile Include="ExceptionEventArgs.cs" />
     <Compile Include="Offline\InitialPullStrategy.cs" />
     <Compile Include="Offline\OfflineCacheAdapter.cs" />
     <Compile Include="Offline\OfflineEntry.cs" />

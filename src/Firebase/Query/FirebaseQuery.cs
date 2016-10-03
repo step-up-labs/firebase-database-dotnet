@@ -84,9 +84,14 @@ namespace Firebase.Database.Query
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <returns> Observable stream of <see cref="FirebaseEvent{T}"/>. </returns>
-        public IObservable<FirebaseEvent<T>> AsObservable<T>(string elementRoot = "")
+        public IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ExceptionEventArgs<FirebaseException>> exceptionHandler = null, string elementRoot = "")
         {
-            return Observable.Create<FirebaseEvent<T>>(observer => new FirebaseSubscription<T>(observer, this, elementRoot, new FirebaseCache<T>()).Run());
+            return Observable.Create<FirebaseEvent<T>>(observer =>
+            {
+                var sub = new FirebaseSubscription<T>(observer, this, elementRoot, new FirebaseCache<T>());
+                sub.ExceptionThrown += exceptionHandler;
+                return sub.Run();
+            });
         }
 
         /// <summary>

@@ -1,21 +1,28 @@
-﻿namespace Firebase.Database.Offline
+﻿namespace Firebase.Database
 {
     using System;
 
     /// <summary>
     /// Event args holding the <see cref="Exception"/> object.
     /// </summary>
-    public class ExceptionEventArgs : EventArgs
+    public class ExceptionEventArgs<T> : EventArgs where T : Exception
     {
-        public readonly Exception Exception;
+        public readonly T Exception;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExceptionEventArgs"/> class.
         /// </summary>
         /// <param name="exception"> The exception. </param>
-        public ExceptionEventArgs(Exception exception)
+        public ExceptionEventArgs(T exception)
         {
             this.Exception = exception;
+        }
+    }
+
+    public class ExceptionEventArgs : ExceptionEventArgs<Exception>
+    {
+        public ExceptionEventArgs(Exception exception) : base(exception)
+        {
         }
     }
 }
