@@ -181,7 +181,10 @@
             if (this.streamChanges)
             {
                 var query = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
-                return new FirebaseSubscription<T>(observer, query, this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.Database))).Run();
+                var sub = new FirebaseSubscription<T>(observer, query, this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.Database)));
+                sub.ExceptionThrown += this.StreamingExceptionThrown;
+
+                return sub.Run();
             } 
                 
             return Observable.Never<string>().Subscribe();
@@ -260,6 +263,11 @@
                 item.SyncOptions = SyncOptions.None;
                 this.Database[key] = item;
             }
+        }
+
+        private void StreamingExceptionThrown(object sender, ExceptionEventArgs<FirebaseException> e)
+        {
+            this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(e.Exception));
         }
     }
 }
