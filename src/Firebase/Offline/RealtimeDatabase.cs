@@ -128,10 +128,13 @@
         {
             if (this.observable == null)
             { 
-                var initialData = this.Database
-                    .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
-                    .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline))
-                    .ToList().ToObservable();
+                var initialData = this.Database.Count == 0 
+                    ? Observable.Return(FirebaseEvent<T>.Empty(FirebaseEventSource.Offline)) 
+                    : this.Database
+                        .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
+                        .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline))
+                        .ToList()
+                        .ToObservable();
 
                 this.observable = initialData
                     .Merge(this.subject)

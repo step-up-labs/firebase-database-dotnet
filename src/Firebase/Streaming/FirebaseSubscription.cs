@@ -173,6 +173,7 @@ namespace Firebase.Database.Streaming
 
                     if (path == "/" && data == string.Empty)
                     {
+                        this.observer.OnNext(FirebaseEvent<T>.Empty(FirebaseEventSource.Online));
                         return;
                     }
 

@@ -34,5 +34,7 @@ namespace Firebase.Database.Streaming
         {
             get;
         }
+
+        public static FirebaseEvent<T> Empty(FirebaseEventSource source) => new FirebaseEvent<T>(string.Empty, default(T), FirebaseEventType.InsertOrUpdate, source);
     }
 }
