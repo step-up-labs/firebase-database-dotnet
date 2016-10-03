@@ -17,6 +17,7 @@ namespace Firebase.Database.Streaming
     public class FirebaseCache<T> : IEnumerable<FirebaseObject<T>>
     {
         private readonly IDictionary<string, T> dictionary;
+        private readonly bool isDictionaryType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseCache{T}"/> class.
@@ -33,6 +34,7 @@ namespace Firebase.Database.Streaming
         public FirebaseCache(IDictionary<string, T> existingItems)
         {
             this.dictionary = existingItems;
+            this.isDictionaryType = typeof(IDictionary).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
         }
 
         /// <summary>
@@ -107,7 +109,7 @@ namespace Firebase.Database.Streaming
             }
 
             // now insert the data
-            if (obj is IDictionary)
+            if (obj is IDictionary && !this.isDictionaryType)
             {
                 // insert data into dictionary and return it as a collection of FirebaseObject
                 var dictionary = obj as IDictionary;

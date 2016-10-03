@@ -293,5 +293,27 @@
 
             entities.First().ShouldBeEquivalentTo(new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(8, 3, 3)));
         }
+
+        [TestMethod]
+        public void DictionaryCache()
+        {
+            var cache = new FirebaseCache<Dictionary<string, string>>();
+            var data = @"
+{
+    ""a"": ""aa"",
+    ""b"": ""bb""
+}";
+
+            var updateData = @"aaa";
+
+            cache.PushData("root/", data).ToList();
+            var entities = cache.PushData("root/a", updateData).ToList();
+
+            entities.First().ShouldBeEquivalentTo(new FirebaseObject<Dictionary<string, string>>("root",  new Dictionary<string, string>()
+            {
+                ["a"] = "aaa",
+                ["b"] = "bb",
+            }));
+        }
     }
 }
