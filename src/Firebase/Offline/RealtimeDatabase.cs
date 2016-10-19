@@ -47,6 +47,8 @@
             this.Database = offlineDatabaseFactory(typeof(T), filenameModifier);
             this.subject = new Subject<FirebaseEvent<T>>();
 
+            this.PutHandler = new PutHandler<T>();
+
             Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
@@ -62,6 +64,12 @@
         {
             get;
             private set;
+        }
+
+        public IPutHandler<T> PutHandler
+        {
+            private get;
+            set;
         }
 
         /// <summary>
@@ -230,7 +238,7 @@
 
             foreach (var group in groups)
             {
-                var tasks = group.Select(kvp => this.childQuery.Child(kvp.Key).PutAsync(kvp.Value.Deserialize<T>())).ToList();
+                var tasks = group.Select(kvp => this.PutHandler.PutAsync(this.childQuery, kvp.Key, kvp.Value)).ToList();
 
                 await Task.WhenAll(tasks);
 

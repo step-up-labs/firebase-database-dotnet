@@ -52,8 +52,10 @@
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="ExceptionEventArgs.cs" />
     <Compile Include="Offline\InitialPullStrategy.cs" />
+    <Compile Include="Offline\IPutHandler.cs" />
     <Compile Include="Offline\OfflineCacheAdapter.cs" />
     <Compile Include="Offline\OfflineEntry.cs" />
+    <Compile Include="Offline\PutHandler.cs" />
     <Compile Include="Offline\RealtimeDatabase.cs" />
     <Compile Include="Offline\SyncOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
