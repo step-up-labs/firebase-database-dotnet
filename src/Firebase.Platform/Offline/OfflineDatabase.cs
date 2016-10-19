@@ -22,7 +22,13 @@
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
         public OfflineDatabase(Type itemType, string filenameModifier)
         {
-            this.db = new DbInstance(this.GetFileName(itemType.FullName) + filenameModifier);
+            var fullName = this.GetFileName(itemType.FullName);
+            if (fullName.Length > 100)
+            {
+                fullName = fullName.Substring(0, 100);
+            }
+
+            this.db = new DbInstance(fullName + filenameModifier);
             this.db.Map<OfflineEntry>().Automap(o => o.Key);
             this.db.Initialize();
 
