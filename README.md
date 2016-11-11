@@ -23,6 +23,44 @@ Install-Package FirebaseDatabase.net -pre
 
 ## Usage
 
+### Authentication
+
+The simplest solution where you only use your app secret is as follows:
+
+```
+var auth = "ABCDE"; // your app secret
+var firebaseClient = new FirebaseClient(
+  "<URL>",
+  new FirebaseOptions
+  {
+    AuthTokenAsyncFactory = () => Task.FromResult(auth) 
+  });
+```
+
+Note that using app secret can only be done for server-side scenarios. Otherwise you should use some sort of third-party login. 
+
+```
+var auth = "ABCDE"; // your app secret
+var firebaseClient = new FirebaseClient(
+  "<URL>",
+  new FirebaseOptions
+  {
+    AuthTokenAsyncFactory = () => LoginAsync()
+  });
+
+...
+
+public static async Task<string> LoginAsync()
+{
+  // manage oauth login to Google / Facebook etc.
+  // call FirebaseAuthentication.net library to get the Firebase Token
+  // return the token
+}
+  
+```
+
+As you can se, the AuthTokenAsyncFactory is of type `Func<Task<string>>`. This is to allow refreshing the expired token in streaming scenarios, in which case the func is called to get a fresh token.
+
 ### Querying
 
 ```csharp
