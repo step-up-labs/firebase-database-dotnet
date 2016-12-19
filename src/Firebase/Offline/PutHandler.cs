@@ -6,7 +6,7 @@
 
     public class PutHandler<T> : IPutHandler<T>
     {
-        public Task PutAsync(ChildQuery query, string key, OfflineEntry entry)
+        public virtual Task PutAsync(ChildQuery query, string key, OfflineEntry entry)
         {
             return query.Child(key).PutAsync(entry.Deserialize<T>());
         }
