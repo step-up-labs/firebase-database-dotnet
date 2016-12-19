@@ -8,6 +8,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Firebase.Database.Extensions;
     using Firebase.Database.Query;
     using Firebase.Database.Streaming;
     using System.Reactive.Threading.Tasks;
@@ -147,7 +148,7 @@
                 this.observable = initialData
                     .Merge(this.subject)
                     .Merge(this.GetInitialPullObservable()
-                            .Retry()
+                            .RetryAfterDelay(TimeSpan.FromSeconds(10))
                             .SelectMany(e => e)
                             .Do(e => this.Database[e.Key] = new OfflineEntry(e.Key, e.Object, 1, SyncOptions.None))
                             .Select(e => new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online))
@@ -223,7 +224,7 @@
                     this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(10000);
             }
         }
 

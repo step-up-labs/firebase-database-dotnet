@@ -41,6 +41,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ObservableExtensions.cs" />
     <Compile Include="FirebaseClient.cs" />
     <Compile Include="FirebaseException.cs" />
     <Compile Include="FirebaseKeyGenerator.cs" />
