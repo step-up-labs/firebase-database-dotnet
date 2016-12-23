@@ -31,8 +31,9 @@
 
             // subscribe to messages comming in, ignoring the ones that are from me
             var subscription = observable
-                .Where(f => f.Object.Author != name)
-                .Subscribe(m => Console.WriteLine($"{m.Object.Author}: {m.Object.Content}"));
+                .Where(f => !string.IsNullOrEmpty(f.Key)) // you get empty Key when there are no data on the server for specified node
+                .Where(f => f.Object?.Author != name)
+                .Subscribe(f => Console.WriteLine($"{f.Object.Author}: {f.Object.Content}"));
 
             while (true)
             {
