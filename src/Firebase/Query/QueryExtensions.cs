@@ -11,7 +11,7 @@ namespace Firebase.Database.Query
         /// <param name="node"> The child. </param>
         /// <param name="token"> The auth token. </param>
         /// <returns> The <see cref="AuthQuery"/>. </returns>
-        public static AuthQuery WithAuth(this FirebaseQuery node, string token)
+        internal static AuthQuery WithAuth(this FirebaseQuery node, string token)
         {
             return node.WithAuth(() => token);
         }
