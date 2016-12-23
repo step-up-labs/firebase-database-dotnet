@@ -27,8 +27,8 @@
                 });
 
 
-            var messagesDb = client.Child("messages").AsRealtimeDatabase<Message>(string.Empty);
-            var authorsDb = client.Child("authors").AsRealtimeDatabase<Author>(string.Empty);
+            var messagesDb = client.Child("offlinemessages").AsRealtimeDatabase<Message>();
+            var authorsDb = client.Child("offlineauthors").AsRealtimeDatabase<Author>();
 
             // watch exceptions
             authorsDb.SyncExceptionThrown += (s, ex) => Console.WriteLine(ex.Exception);
@@ -41,12 +41,14 @@
 
             var e = (from author in authorsDb.AsObservable()
                      from message in messagesDb.AsObservable()
+                     where !string.IsNullOrEmpty(author.Key)
+                     where !string.IsNullOrEmpty(message.Key)
                      where author.Key == message.Object.Author
                      where author.Key != myKey
                      select new { author, message }
                     ).Distinct(pair => pair.author.Key + pair.message.Key);
 
-            e.Subscribe(pair => Console.WriteLine($"{pair.author.Object.Name}: {pair.message.Object.Content}"));
+            e.Subscribe(pair => Console.WriteLine($"{pair.author.Object.Name}: {pair.message.Object.Content} ({pair.message.EventSource})"));
 
             while (true)
             {
