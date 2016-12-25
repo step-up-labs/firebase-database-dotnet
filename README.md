@@ -92,7 +92,7 @@ var dino = await firebase
 Console.WriteLine($"Key for the new dinosaur: {dino.Key}");  
 
 // add new item directly to the specified location (this will overwrite whatever data already exists at that location)
-var dino = await firebase
+await firebase
   .Child("dinosaurs")
   .Child("t-rex")
   .PutAsync(new Dinosaur());
