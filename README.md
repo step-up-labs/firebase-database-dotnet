@@ -77,7 +77,7 @@ foreach (var dino in dinos)
 }
 ```
 
-### Saving data
+### Saving & deleting data
 
 ```csharp
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
@@ -97,6 +97,11 @@ await firebase
   .Child("t-rex")
   .PutAsync(new Dinosaur());
 
+// delete given child node
+await firebase
+  .Child("dinosaurs")
+  .Child("t-rex")
+  .DeleteAsync();
 ```
 
 ### Realtime streaming
