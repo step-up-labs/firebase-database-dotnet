@@ -3,9 +3,9 @@
 
 Simple wrapper on top of [Firebase Realtime Database REST API](https://firebase.google.com/docs/database/). Among others it supports streaming API which you can use for realtime notifications.
 
-For Authenticating with Firebase checkout the [Firebase Authentication library](https://github.com/step-up-labs/firebase-authentication-dotnet) and related [blog post](http://blog.bezysoftware.net/firebase-authentication-csharp-library/)
+For Authenticating with Firebase checkout the [Firebase Authentication library](https://github.com/step-up-labs/firebase-authentication-dotnet) and related [blog post](https://medium.com/step-up-labs/firebase-authentication-c-library-8e5e1c30acc2)
 
-To upload files to Firebase Storage checkout the [Firebase Storage library](https://github.com/step-up-labs/firebase-storage-dotnet)
+To upload files to Firebase Storage checkout the [Firebase Storage library](https://github.com/step-up-labs/firebase-storage-dotnet) and related [blog post](https://medium.com/step-up-labs/firebase-storage-c-library-d1656cc8b3c3)
 
 ## Installation
 ```csharp
