@@ -20,6 +20,9 @@
             get;
         }
 
+        /// <summary>
+        /// Original url of the request.
+        /// </summary>
         public string RequestUrl
         {
             get;
