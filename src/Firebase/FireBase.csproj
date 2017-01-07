@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\ObservableExtensions.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="FirebaseClient.cs" />
     <Compile Include="FirebaseException.cs" />
     <Compile Include="FirebaseKeyGenerator.cs" />
