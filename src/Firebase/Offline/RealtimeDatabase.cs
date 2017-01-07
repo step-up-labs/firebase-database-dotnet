@@ -239,11 +239,19 @@
 
             foreach (var group in groups)
             {
-                var tasks = group.Select(kvp => this.PutHandler.PutAsync(this.childQuery, kvp.Key, kvp.Value)).ToList();
+                var tasks = group.Select(kvp => 
+                    this.PutHandler
+                        .PutAsync(this.childQuery, kvp.Key, kvp.Value)
+                        .ContinueWith(t => this.ResetSyncOptions(kvp.Key), TaskContinuationOptions.OnlyOnRanToCompletion));
 
-                await Task.WhenAll(tasks);
-
-                this.ResetSyncOptions(group.Select(s => s.Key));
+                try
+                {
+                    await Task.WhenAll(tasks).WithAggregateException();
+                }
+                catch (Exception ex)
+                {
+                    this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
+                }
             }
         }
 
@@ -253,25 +261,30 @@
 
             foreach (var group in taskGroups)
             {
-                var tasks = group.Select(pair => new { Key = pair.Key, Task = this.childQuery.Child(pair.Key).OnceSingleAsync<T>(), Priority = pair.Value.Priority }).ToList();
-
-                await Task.WhenAll(tasks.Select(t => t.Task));
-
-                foreach (var task in tasks)
+                var tasks = group.Select(pair => 
+                    this.childQuery
+                        .Child(pair.Key)
+                        .OnceSingleAsync<T>()
+                        .ContinueWith(
+                            task => this.SetAndRaise(pair.Key, new OfflineEntry(pair.Key, task.Result, pair.Value.Priority, SyncOptions.None), FirebaseEventSource.Online),
+                            TaskContinuationOptions.OnlyOnRanToCompletion));
+                
+                try
+                { 
+                    await Task.WhenAll(tasks).WithAggregateException();
+                }
+                catch (Exception ex)
                 {
-                    this.SetAndRaise(task.Key, new OfflineEntry(task.Key, task.Task.Result, task.Priority, SyncOptions.None), FirebaseEventSource.Online);
+                    this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
                 }
             }
         }
 
-        private void ResetSyncOptions(IEnumerable<string> entries)
+        private void ResetSyncOptions(string key)
         {
-            foreach (var key in entries)
-            {
-                var item = this.Database[key];
-                item.SyncOptions = SyncOptions.None;
-                this.Database[key] = item;
-            }
+            var item = this.Database[key];
+            item.SyncOptions = SyncOptions.None;
+            this.Database[key] = item;
         }
 
         private void StreamingExceptionThrown(object sender, ExceptionEventArgs<FirebaseException> e)
