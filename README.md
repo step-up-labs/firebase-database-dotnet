@@ -17,7 +17,7 @@ Install-Package FirebaseDatabase.net -pre
 ```
 
 ## Supported frameworks
-* .NET Standard 1.5
+* .NET Standard 1.1
 
 ## Usage
 
