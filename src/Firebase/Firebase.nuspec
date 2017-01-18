@@ -24,8 +24,8 @@
 		<copyright>Step Up Labs, Inc. 2016</copyright>
 		<tags>Firebase Database Realtime</tags>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="8.0.3" />
-      <dependency id="Rx-Main" version="2.2.5" />
+      <dependency id="Newtonsoft.Json" version="9.0.1" />
+      <dependency id="System.Reactive" version="3.1.1" />
     </dependencies>
 	</metadata>
 </package>
