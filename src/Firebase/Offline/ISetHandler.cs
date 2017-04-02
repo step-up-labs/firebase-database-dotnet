@@ -4,7 +4,7 @@
 
     using System.Threading.Tasks;
 
-    public interface IPutHandler<in T>
+    public interface ISetHandler<in T>
     {
         Task PutAsync(ChildQuery query, string key, OfflineEntry entry);
     }

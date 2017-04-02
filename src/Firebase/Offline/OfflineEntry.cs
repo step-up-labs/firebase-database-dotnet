@@ -18,7 +18,7 @@
         /// <param name="obj"> The object. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>  
         /// <param name="syncOptions"> The sync options. </param>
-        public OfflineEntry(string key, object obj, int priority, SyncOptions syncOptions = SyncOptions.Push)
+        public OfflineEntry(string key, object obj, int priority, SyncOptions syncOptions)
         {
             this.Key = key;
             this.Priority = priority;

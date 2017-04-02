@@ -48,7 +48,7 @@
             this.Database = offlineDatabaseFactory(typeof(T), filenameModifier);
             this.subject = new Subject<FirebaseEvent<T>>();
 
-            this.PutHandler = new PutHandler<T>();
+            this.PutHandler = new SetHandler<T>();
 
             Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
@@ -67,7 +67,7 @@
             private set;
         }
 
-        public IPutHandler<T> PutHandler
+        public ISetHandler<T> PutHandler
         {
             private get;
             set;
@@ -80,36 +80,9 @@
         /// <param name="obj"> The object to set. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
-        public void Put(string key, T obj, bool syncOnline = true, int priority = 1)
+        public void Set(string key, T obj, SyncOptions syncOptions, int priority = 1)
         {
-            this.SetAndRaise(key, new OfflineEntry(key, obj, priority, syncOnline ? SyncOptions.Push : SyncOptions.None));
-        }
-
-        /// <summary>
-        /// Adds a new entity to the Database.
-        /// </summary>
-        /// <param name="obj"> The object to add.  </param>
-        /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
-        /// <returns> The generated key for this object. </returns>
-        public string Post(T obj, bool syncOnline = true, int priority = 1)
-        {
-            var key = FirebaseKeyGenerator.Next();
-
-            this.SetAndRaise(key, new OfflineEntry(key, obj, priority, syncOnline ? SyncOptions.Push : SyncOptions.None));
-
-            return key;
-        }
-
-        /// <summary>
-        /// Deletes the entity with the given key.
-        /// </summary>
-        /// <param name="key"> The key. </param>
-        /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
-        public void Delete(string key, bool syncOnline = true, int priority = 1)
-        {
-            this.SetAndRaise(key, new OfflineEntry(key, null, priority, syncOnline ? SyncOptions.Push : SyncOptions.None));
+            this.SetAndRaise(key, new OfflineEntry(key, obj, priority, syncOptions));
         }
 
         /// <summary>
@@ -216,7 +189,7 @@
 
                     if (this.pushChanges)
                     {
-                        await this.PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Push));
+                        await this.PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Put || kvp.Value.SyncOptions == SyncOptions.Patch));
                     }
                 }
                 catch (Exception ex)
