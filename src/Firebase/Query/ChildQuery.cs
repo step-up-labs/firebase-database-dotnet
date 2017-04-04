@@ -1,9 +1,7 @@
 namespace Firebase.Database.Query
 {
     using System;
-
-    using Firebase.Database.Offline;
-
+    
     /// <summary>
     /// Firebase query which references the child of current node.
     /// </summary>
@@ -31,21 +29,6 @@ namespace Firebase.Database.Query
         public ChildQuery(FirebaseClient client, Func<string> pathFactory)
             : this(null, pathFactory, client)
         {
-        }
-
-        /// <summary>
-        /// The as offline database.
-        /// </summary>
-        /// <typeparam name="T"> Type of elements. </typeparam>
-        /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
-        /// <param name="elementRoot"> Optional custom root element of received json items. </param>
-        /// <param name="streamChanges"> Specifies whether changes should be streamed from the server. </param> 
-        /// <param name="initialPullStrategy"> Specifies what strategy should be used for initial pulling of server data. </param>
-        /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
-        /// <returns> The <see cref="RealtimeDatabase{T}"/>. </returns>
-        public RealtimeDatabase<T> AsRealtimeDatabase<T>(string filenameModifier = "", string elementRoot = "", bool streamChanges = true, InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true) where T : class
-        {
-            return new RealtimeDatabase<T>(this, elementRoot, this.Client.Options.OfflineDatabaseFactory, filenameModifier, streamChanges, initialPullStrategy, pushChanges);
         }
 
         /// <summary>
