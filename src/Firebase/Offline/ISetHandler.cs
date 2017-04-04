@@ -6,6 +6,6 @@
 
     public interface ISetHandler<in T>
     {
-        Task PutAsync(ChildQuery query, string key, OfflineEntry entry);
+        Task SetAsync(ChildQuery query, string key, OfflineEntry entry);
     }
 }

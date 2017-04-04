@@ -221,7 +221,7 @@
             {
                 var tasks = group.Select(kvp => 
                     this.PutHandler
-                        .PutAsync(this.childQuery, kvp.Key, kvp.Value)
+                        .SetAsync(this.childQuery, kvp.Key, kvp.Value)
                         .ContinueWith(t => this.ResetSyncOptions(kvp.Key), TaskContinuationOptions.OnlyOnRanToCompletion));
 
                 try
