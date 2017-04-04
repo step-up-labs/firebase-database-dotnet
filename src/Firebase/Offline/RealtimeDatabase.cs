@@ -197,7 +197,7 @@
                     this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
                 }
 
-                await Task.Delay(10000);
+                await Task.Delay(this.childQuery.Client.Options.SyncPeriod);
             }
         }
 
