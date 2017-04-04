@@ -176,6 +176,36 @@
             entities.Should().HaveCount(1);
             entities.First().ShouldBeEquivalentTo(jurassicPrague);
             jurassicPrague.Object.Dinosaurs["stegosaurus"].Dimensions.ShouldBeEquivalentTo(new Dimensions { Height = 4, Length = 4, Weight = 4 });
+
+            //var entities = cache.PushData("/jurassicPrague/dinosaurs/stegosaurus/Name", "").ToList();
+        }
+
+        [TestMethod]
+        public void NestedDictionaryChanged()
+        {
+            var jurassicPrague = new FirebaseObject<JurassicWorld>("jurassicPrague", new JurassicWorld());
+            jurassicPrague.Object.Dinosaurs.Add("lambeosaurus", new Dinosaur(2, 2, 2));
+            jurassicPrague.Object.Dinosaurs.Add("stegosaurus", new Dinosaur(3, 3, 3));
+
+            var cache = new FirebaseCache<JurassicWorld>(new Dictionary<string, JurassicWorld>()
+                { { jurassicPrague.Key, jurassicPrague.Object } }
+            );
+
+            var trex = @"
+{
+    ""trex"": {
+        ""ds"": {
+            ""height"" : 5,
+            ""length"" : 4,
+            ""weight"": 4
+        }
+    }
+}";
+            var entities = cache.PushData("/jurassicPrague/dinosaurs/", trex).ToList();
+
+            entities.Should().HaveCount(1);
+            entities.First().ShouldBeEquivalentTo(jurassicPrague);
+            jurassicPrague.Object.Dinosaurs["trex"].Dimensions.ShouldBeEquivalentTo(new Dimensions { Height = 5, Length = 4, Weight = 4 });
         }
 
         [TestMethod]
