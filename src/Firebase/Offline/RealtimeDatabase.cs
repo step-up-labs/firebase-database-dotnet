@@ -12,6 +12,10 @@
     using Firebase.Database.Query;
     using Firebase.Database.Streaming;
     using System.Reactive.Threading.Tasks;
+    using System.Linq.Expressions;
+    using Internals;
+    using Newtonsoft.Json;
+    using System.Reflection;
 
     /// <summary>
     /// The real-time Database which synchronizes online and offline data. 
@@ -25,9 +29,10 @@
         private readonly Subject<FirebaseEvent<T>> subject;
         private readonly InitialPullStrategy initialPullStrategy;
         private readonly bool pushChanges;
+        private readonly FirebaseCache<T> firebaseCache;
 
         private IObservable<FirebaseEvent<T>> observable;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RealtimeDatabase{T}"/> class.
         /// </summary>
@@ -46,6 +51,7 @@
             this.initialPullStrategy = initialPullStrategy;
             this.pushChanges = pushChanges;
             this.Database = offlineDatabaseFactory(typeof(T), filenameModifier);
+            this.firebaseCache = new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.Database));
             this.subject = new Subject<FirebaseEvent<T>>();
 
             this.PutHandler = new SetHandler<T>();
@@ -85,6 +91,34 @@
             this.SetAndRaise(key, new OfflineEntry(key, obj, priority, syncOptions));
         }
 
+        public void Set<TProperty>(string key, Expression<Func<T, TProperty>> propertyExpression, object value, SyncOptions syncOptions, int priority = 1)
+        {
+            var fullKey = this.GenerateFullKey(key, propertyExpression, syncOptions);
+            var serializedObject = JsonConvert.SerializeObject(value).Trim('"', '\\');
+
+            if (fullKey.Item3)
+            {
+                if (typeof(TProperty) != typeof(string) || value == null)
+                {
+                    // don't escape non-string primitives and null;
+                    serializedObject = $"{{ \"{fullKey.Item2}\" : {serializedObject} }}";
+                }
+                else
+                {
+                    serializedObject = $"{{ \"{fullKey.Item2}\" : \"{serializedObject}\" }}";
+                }
+            }
+
+            var setObject = this.firebaseCache.PushData(fullKey.Item1, serializedObject).First();
+
+            if (!this.Database.ContainsKey(key) || this.Database[key].SyncOptions != SyncOptions.Patch && this.Database[key].SyncOptions != SyncOptions.Put)
+            {
+                this.Database[fullKey.Item1] = new OfflineEntry(fullKey.Item1, value, serializedObject, priority, syncOptions, true);
+            }
+
+            this.subject.OnNext(new FirebaseEvent<T>(key, setObject.Object, setObject == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline));
+        }
+
         /// <summary>
         /// Fetches an object with the given key and adds it to the Database.
         /// </summary>
@@ -109,11 +143,11 @@
         public IObservable<FirebaseEvent<T>> AsObservable()
         {
             if (this.observable == null)
-            { 
-                var initialData = this.Database.Count == 0 
-                    ? Observable.Return(FirebaseEvent<T>.Empty(FirebaseEventSource.Offline)) 
+            {
+                var initialData = this.Database.Count == 0
+                    ? Observable.Return(FirebaseEvent<T>.Empty(FirebaseEventSource.Offline))
                     : this.Database
-                        .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null")
+                        .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null" && !kvp.Value.IsPartial)
                         .Select(kvp => new FirebaseEvent<T>(kvp.Key, kvp.Value.Deserialize<T>(), FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline))
                         .ToList()
                         .ToObservable();
@@ -123,7 +157,7 @@
                     .Merge(this.GetInitialPullObservable()
                             .RetryAfterDelay(TimeSpan.FromSeconds(10))
                             .SelectMany(e => e)
-                            .Do(e => this.Database[e.Key] = new OfflineEntry(e.Key, e.Object, 1, SyncOptions.None))
+                            .Do(this.SetObjectFromInitialPull)
                             .Select(e => new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online))
                             .Concat(Observable.Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))))
                     .Replay()
@@ -131,6 +165,18 @@
             }
 
             return this.observable;
+        }
+
+        private void SetObjectFromInitialPull(FirebaseObject<T> e)
+        {
+            // set object with no sync only if it doesn't exist yet 
+            // and the InitialPullStrategy != Everything
+            // this attempts to deal with scenario when you are offline, have local changes and go online
+            // in this case having the InitialPullStrategy set to everything would basically purge all local changes
+            if (!this.Database.ContainsKey(e.Key) || this.Database[e.Key].SyncOptions == SyncOptions.None || this.Database[e.Key].SyncOptions == SyncOptions.Pull || this.initialPullStrategy != InitialPullStrategy.Everything)
+            {
+                this.Database[e.Key] = new OfflineEntry(e.Key, e.Object, 1, SyncOptions.None);
+            }
         }
 
         private IObservable<IReadOnlyCollection<FirebaseObject<T>>> GetInitialPullObservable()
@@ -163,7 +209,7 @@
             if (this.streamChanges)
             {
                 var query = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
-                var sub = new FirebaseSubscription<T>(observer, query, this.elementRoot, new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.Database)));
+                var sub = new FirebaseSubscription<T>(observer, query, this.elementRoot, this.firebaseCache);
                 sub.ExceptionThrown += this.StreamingExceptionThrown;
 
                 return sub.Run();
@@ -215,7 +261,7 @@
 
         private async Task PushEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pushEntries)
         {
-            var groups = pushEntries.GroupBy(pair => pair.Value.Priority).OrderByDescending(kvp => kvp.Key);
+            var groups = pushEntries.GroupBy(pair => pair.Value.Priority).OrderBy(kvp => kvp.Key).ToList();
 
             foreach (var group in groups)
             {
@@ -237,7 +283,7 @@
 
         private async Task PullEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pullEntries)
         {
-            var taskGroups = pullEntries.GroupBy(pair => pair.Value.Priority).OrderByDescending(kvp => kvp.Key);
+            var taskGroups = pullEntries.GroupBy(pair => pair.Value.Priority).OrderBy(kvp => kvp.Key);
 
             foreach (var group in taskGroups)
             {
@@ -263,13 +309,36 @@
         private void ResetSyncOptions(string key)
         {
             var item = this.Database[key];
-            item.SyncOptions = SyncOptions.None;
-            this.Database[key] = item;
+
+            if (item.IsPartial)
+            {
+                this.Database.Remove(key);
+            }
+            else
+            {
+                item.SyncOptions = SyncOptions.None;
+                this.Database[key] = item;
+            }
         }
 
         private void StreamingExceptionThrown(object sender, ExceptionEventArgs<FirebaseException> e)
         {
             this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(e.Exception));
+        }
+
+        private Tuple<string, string, bool> GenerateFullKey<TProperty>(string key, Expression<Func<T, TProperty>> propertyGetter, SyncOptions syncOptions)
+        {
+            var visitor = new MemberAccessVisitor();
+            visitor.Visit(propertyGetter);
+            var propertyType = typeof(TProperty).GetTypeInfo();
+
+            // primitive types
+            if (syncOptions == SyncOptions.Patch && propertyType.IsPrimitive || Nullable.GetUnderlyingType(typeof(TProperty)) != null || typeof(TProperty) == typeof(string))
+            {
+                return Tuple.Create(key + "/" + string.Join("/", visitor.PropertyNames.Skip(1).Reverse()), visitor.PropertyNames.First(), true);
+            }
+
+            return Tuple.Create(key + "/" + string.Join("/", visitor.PropertyNames.Reverse()), visitor.PropertyNames.First(), false);
         }
     }
 }

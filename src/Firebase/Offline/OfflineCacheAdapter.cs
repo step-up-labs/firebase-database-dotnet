@@ -36,7 +36,15 @@
 
             set
             {
-                this.database[key.ToString()] = new OfflineEntry(key.ToString(), value, 1, SyncOptions.None);
+                var keyString = key.ToString();
+                if (this.database.ContainsKey(keyString))
+                {
+                    this.database[keyString] = new OfflineEntry(keyString, value, this.database[keyString].Priority, this.database[keyString].SyncOptions);
+                }
+                else
+                {
+                    this.database[keyString] = new OfflineEntry(keyString, value, 1, SyncOptions.None);
+                }
             }
         }
 
@@ -57,7 +65,14 @@
 
             set
             {
-                this.database[key] = new OfflineEntry(key, value, 1, SyncOptions.None);
+                if (this.database.ContainsKey(key))
+                {
+                    this.database[key] = new OfflineEntry(key, value, this.database[key].Priority, this.database[key].SyncOptions);
+                }
+                else
+                {
+                    this.database[key] = new OfflineEntry(key, value, 1, SyncOptions.None);
+                }
             }
         }
 
