@@ -1,3 +1,6 @@
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
 namespace Firebase.Database.Query
 {
     /// <summary>
@@ -125,6 +128,23 @@ namespace Firebase.Database.Query
         public static FilterQuery LimitToLast(this ParameterQuery child, int count)
         {
             return child.LimitToLast(() => count);
+        }
+
+        public static Task PutAsync<T>(this FirebaseQuery query, T obj)
+        {
+            return query.PutAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings));
+        }
+
+        public static Task PatchAsync<T>(this FirebaseQuery query, T obj)
+        {
+            return query.PatchAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings));
+        }
+
+        public static async Task<FirebaseObject<T>> PostAsync<T>(this FirebaseQuery query, T obj, bool generateKeyOffline = true)
+        {
+            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings));
+
+            return new FirebaseObject<T>(result.Key, obj);
         }
     }
 }

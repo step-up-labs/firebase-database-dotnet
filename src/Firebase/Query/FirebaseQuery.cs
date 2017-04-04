@@ -117,23 +117,23 @@ namespace Firebase.Database.Query
         /// <param name="generateKeyOffline"> Specifies whether the key should be generated offline instead of online. </param> 
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> Resulting firebase object with populated key. </returns>
-        public async Task<FirebaseObject<T>> PostAsync<T>(T obj, bool generateKeyOffline = true)
+        public async Task<FirebaseObject<string>> PostAsync(string data, bool generateKeyOffline = true)
         {
             // post generates a new key server-side, while put can be used with an already generated local key
             if (generateKeyOffline)
             {
                 var key = FirebaseKeyGenerator.Next();
-                await new ChildQuery(this, () => key, this.Client).PutAsync(obj).ConfigureAwait(false);
+                await new ChildQuery(this, () => key, this.Client).PutAsync(data).ConfigureAwait(false);
 
-                return new FirebaseObject<T>(key, obj);
+                return new FirebaseObject<string>(key, data);
             }
             else
             {
                 var c = this.GetClient();
-                var data = await this.SendAsync(c, obj, HttpMethod.Post).ConfigureAwait(false);
-                var result = JsonConvert.DeserializeObject<PostResult>(data);
+                var sendData = await this.SendAsync(c, data, HttpMethod.Post).ConfigureAwait(false);
+                var result = JsonConvert.DeserializeObject<PostResult>(sendData);
 
-                return new FirebaseObject<T>(result.Name, obj);
+                return new FirebaseObject<string>(result.Name, data);
             }
         }
 
@@ -143,11 +143,11 @@ namespace Firebase.Database.Query
         /// <param name="obj"> The object. </param>  
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PatchAsync<T>(T obj)
+        public async Task PatchAsync(string data)
         {
             var c = this.GetClient();
 
-            await this.SendAsync(c, obj, new HttpMethod("PATCH")).ConfigureAwait(false);
+            await this.SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -156,11 +156,11 @@ namespace Firebase.Database.Query
         /// <param name="obj"> The object. </param>  
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PutAsync<T>(T obj)
+        public async Task PutAsync(string data)
         {
             var c = this.GetClient();
 
-            await this.SendAsync(c, obj, HttpMethod.Put).ConfigureAwait(false);
+            await this.SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -223,10 +223,10 @@ namespace Firebase.Database.Query
             return this.client;
         }
 
-        private async Task<string> SendAsync<T>(HttpClient client, T obj, HttpMethod method)
+        private async Task<string> SendAsync(HttpClient client, string data, HttpMethod method)
         {
             var url = await this.BuildUrlAsync().ConfigureAwait(false);
-            var requestData = JsonConvert.SerializeObject(obj, this.Client.Options.JsonSerializerSettings);
+            var requestData = data;
             var message = new HttpRequestMessage(method, url)
             {
                 Content = new StringContent(requestData)
