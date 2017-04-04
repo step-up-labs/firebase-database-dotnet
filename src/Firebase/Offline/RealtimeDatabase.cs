@@ -203,7 +203,14 @@
 
         private string GetLatestKey()
         {
-            return this.Database.OrderBy(o => o.Key, StringComparer.Ordinal).LastOrDefault().Key;
+            var key = this.Database.OrderBy(o => o.Key, StringComparer.Ordinal).LastOrDefault().Key;
+
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                key = key.Substring(0, key.Length - 1) + (char)(key[key.Length - 1] + 1);
+            }
+
+            return key;
         }
 
         private async Task PushEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pushEntries)
