@@ -43,7 +43,7 @@ namespace Firebase.Database.Streaming
         /// <param name="path"> The path of incoming data, separated by slash. </param>  
         /// <param name="data"> The data in json format as returned by firebase. </param>  
         /// <returns> Collection of top-level entities which were affected by the push. </returns>
-        public IEnumerable<FirebaseObject<T>> PushData(string path, string data) 
+        public IEnumerable<FirebaseObject<T>> PushData(string path, string data)
         {
             object obj = this.dictionary;
             Action<object> primitiveObjSetter = null;
@@ -69,16 +69,8 @@ namespace Firebase.Database.Streaming
                     }
                     else
                     {
-                        if (valueType == typeof(string))
-                        {
-                            dictionary[element] = string.Empty;
-                            obj = dictionary[element];
-                        }
-                        else
-                        {
-                            dictionary[element] = Activator.CreateInstance(valueType);
-                            obj = dictionary[element];
-                        }
+                        dictionary[element] = this.CreateInstance(valueType);
+                        obj = dictionary[element];
                     }
                 }
                 else
@@ -93,11 +85,16 @@ namespace Firebase.Database.Streaming
                     objDeleter = () => property.SetValue(objParent, null);
                     primitiveObjSetter = (d) => property.SetValue(objParent, d);
                     obj = property.GetValue(obj);
+                    if (obj == null)
+                    {
+                        obj = this.CreateInstance(property.PropertyType);
+                        property.SetValue(objParent, obj);
+                    }
                 }
             }
 
             // if data is null (=empty string) delete it
-            if (string.IsNullOrWhiteSpace(data))
+            if (string.IsNullOrWhiteSpace(data) || data == "null")
             {
                 var key = pathElements[0];
                 var target = this.dictionary[key];
@@ -119,7 +116,19 @@ namespace Firebase.Database.Streaming
                 foreach (var item in objectCollection)
                 {
                     dictionary[item.Key] = item.Object;
-                    yield return new FirebaseObject<T>(item.Key, (T)item.Object);
+
+                    // top level dictionary changed
+                    if (!pathElements.Any())
+                    {
+                        yield return new FirebaseObject<T>(item.Key, (T)item.Object);
+                    }
+                }
+
+                // nested dictionary changed
+                if (pathElements.Any())
+                {
+                    this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
+                    yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
                 }
             }
             else
@@ -142,6 +151,18 @@ namespace Firebase.Database.Streaming
 
                 this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
                 yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
+            }
+        }
+
+        private object CreateInstance(Type type)
+        {
+            if (type == typeof(string))
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return Activator.CreateInstance(type);
             }
         }
 
