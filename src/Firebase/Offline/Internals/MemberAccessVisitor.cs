@@ -1,9 +1,10 @@
 ﻿namespace Firebase.Database.Offline.Internals
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
+
+    using Newtonsoft.Json;
 
     public class MemberAccessVisitor : ExpressionVisitor
     {
@@ -20,7 +21,9 @@
             if (expr?.NodeType == ExpressionType.MemberAccess)
             {
                 var memberExpr = (MemberExpression)expr;
-                this.propertyNames.Add(memberExpr.Member.Name);
+                var jsonAttr = memberExpr.Member.GetCustomAttribute<JsonPropertyAttribute>();
+                
+                this.propertyNames.Add(jsonAttr?.PropertyName ?? memberExpr.Member.Name);
             }
             else if (expr?.NodeType == ExpressionType.Call)
             {
