@@ -333,7 +333,7 @@
             var propertyType = typeof(TProperty).GetTypeInfo();
 
             // primitive types
-            if (syncOptions == SyncOptions.Patch && propertyType.IsPrimitive || Nullable.GetUnderlyingType(typeof(TProperty)) != null || typeof(TProperty) == typeof(string))
+            if (syncOptions == SyncOptions.Patch && (propertyType.IsPrimitive || Nullable.GetUnderlyingType(typeof(TProperty)) != null || typeof(TProperty) == typeof(string)))
             {
                 return Tuple.Create(key + "/" + string.Join("/", visitor.PropertyNames.Skip(1).Reverse()), visitor.PropertyNames.First(), true);
             }
