@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>FirebaseDatabase.Platform.net</id>
-		<version>1.0.0</version>
+		<version>3.0.0</version>
 		<title>FirebaseDatabase.net platform services</title>
 		<authors>Step Up Labs, Inc.</authors>
 		<owners>Step Up Labs, Inc.</owners>
@@ -14,7 +14,7 @@
 		<copyright>Step Up Labs, Inc. 2016</copyright>
 		<tags>Firebase Database Realtime</tags>
     <dependencies>
-      <dependency id="FirebaseDatabase.net" version="2.0.0" />
+      <dependency id="FirebaseDatabase.net" version="3.0.0-alpha3" />
       <dependency id="Lex.Db" version="1.2.6" />
     </dependencies>
 	</metadata>
