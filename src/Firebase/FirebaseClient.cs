@@ -1,3 +1,5 @@
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Firebase.Database.Tests")]
+
 namespace Firebase.Database
 {
     using System;
