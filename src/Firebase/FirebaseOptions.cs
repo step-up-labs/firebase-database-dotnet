@@ -63,5 +63,14 @@
             get;
             set;
         }
+
+        /// <summary>
+        /// Specify if token returned by factory will be used as "auth" url parameter or "access_token". 
+        /// </summary>
+        public bool AsAccessToken
+        {
+            get;
+            set;
+        }
     }
 }
