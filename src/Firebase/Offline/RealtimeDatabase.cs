@@ -287,14 +287,8 @@
 
             foreach (var group in taskGroups)
             {
-                var tasks = group.Select(pair => 
-                    this.childQuery
-                        .Child(pair.Key)
-                        .OnceSingleAsync<T>()
-                        .ContinueWith(
-                            task => this.SetAndRaise(pair.Key, new OfflineEntry(pair.Key, task.Result, pair.Value.Priority, SyncOptions.None), FirebaseEventSource.Online),
-                            TaskContinuationOptions.OnlyOnRanToCompletion));
-                
+                var tasks = group.Select(pair => this.ResetAfterTask(this.childQuery.Child(pair.Key).OnceSingleAsync<T>(), pair.Key, pair.Value));
+
                 try
                 { 
                     await Task.WhenAll(tasks).WithAggregateException();
@@ -304,6 +298,12 @@
                     this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
                 }
             }
+        }
+
+        private async Task ResetAfterTask(Task<T> task, string key, OfflineEntry entry)
+        {
+            await task;
+            this.SetAndRaise(key, new OfflineEntry(key, task.Result, entry.Priority, SyncOptions.None), FirebaseEventSource.Online);
         }
 
         private void ResetSyncOptions(string key)
