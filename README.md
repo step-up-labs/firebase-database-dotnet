@@ -17,11 +17,7 @@ Install-Package FirebaseDatabase.net -pre
 ```
 
 ## Supported frameworks
-* .NET 4.5+
-* Windows 8.x
-* UWP
-* Windows Phone 8.1
-* CoreCLR
+.NET Standard 1.1 - see https://github.com/dotnet/standard/blob/master/docs/versions.md for compatibility matrix
 
 ## Usage
 
