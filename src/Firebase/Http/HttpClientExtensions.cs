@@ -8,6 +8,7 @@ namespace Firebase.Database.Http
     using System.Threading.Tasks;
 
     using Newtonsoft.Json;
+    using System.Net;
 
     /// <summary>
     /// The http client extensions for object deserializations.
@@ -24,10 +25,12 @@ namespace Firebase.Database.Http
         public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(this HttpClient client, string requestUri)
         {
             var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
 
             try
             {
                 var response = await client.GetAsync(requestUri).ConfigureAwait(false);
+                statusCode = response.StatusCode;
                 responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
@@ -43,7 +46,7 @@ namespace Firebase.Database.Http
             }
             catch (Exception ex)
             {
-                throw new FirebaseException(requestUri, string.Empty, responseData, ex);
+                throw new FirebaseException(requestUri, string.Empty, responseData, statusCode, ex);
             }
         }
 

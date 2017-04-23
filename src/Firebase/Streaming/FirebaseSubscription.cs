@@ -80,6 +80,7 @@ namespace Firebase.Database.Streaming
             {
                 var url = string.Empty;
                 var line = string.Empty;
+                var statusCode = HttpStatusCode.OK;
 
                 try
                 {
@@ -93,6 +94,7 @@ namespace Firebase.Database.Streaming
                     var client = this.GetHttpClient();
                     var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, this.cancel.Token).ConfigureAwait(false);
 
+                    statusCode = response.StatusCode;
                     response.EnsureSuccessStatusCode();
 
                     using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
@@ -100,6 +102,8 @@ namespace Firebase.Database.Streaming
                     {
                         while (true)
                         {
+                            this.cancel.Token.ThrowIfCancellationRequested();
+
                             line = reader.ReadLine()?.Trim();
 
                             if (string.IsNullOrWhiteSpace(line))
@@ -116,7 +120,7 @@ namespace Firebase.Database.Streaming
                                     serverEvent = this.ParseServerEvent(serverEvent, tuple[1]);
                                     break;
                                 case "data":
-                                    this.ProcessServerData(serverEvent, tuple[1]);
+                                    this.ProcessServerData(url, serverEvent, tuple[1]);
                                     break;
                             }
 
@@ -132,9 +136,15 @@ namespace Firebase.Database.Streaming
                 {
                     break;
                 }
+                catch (Exception ex) when (statusCode == HttpStatusCode.Unauthorized)
+                {
+                    this.observer.OnError(new FirebaseException(url, string.Empty, line, statusCode, ex));
+                    this.Dispose();
+                    break;
+                }
                 catch (Exception ex)
                 {
-                    this.ExceptionThrown?.Invoke(this, new ExceptionEventArgs<FirebaseException>(new FirebaseException(url, string.Empty, line, ex)));
+                    this.ExceptionThrown?.Invoke(this, new ExceptionEventArgs<FirebaseException>(new FirebaseException(url, string.Empty, line, statusCode, ex)));
 
                     await Task.Delay(2000).ConfigureAwait(false);
                 }
@@ -165,7 +175,7 @@ namespace Firebase.Database.Streaming
             return serverEvent;
         }
 
-        private void ProcessServerData(FirebaseServerEventType serverEvent, string serverData)
+        private void ProcessServerData(string url, FirebaseServerEventType serverEvent, string serverData)
         {
             switch (serverEvent)
             {
@@ -194,13 +204,9 @@ namespace Firebase.Database.Streaming
                 case FirebaseServerEventType.KeepAlive:
                     break;
                 case FirebaseServerEventType.Cancel:
-                    this.observer.OnError(new Exception("cancel"));
+                    this.observer.OnError(new FirebaseException(url, string.Empty, serverData, HttpStatusCode.Unauthorized));
                     this.Dispose();
-                    throw new OperationCanceledException();
-                case FirebaseServerEventType.AuthRevoked:
-                    this.observer.OnError(new Exception("auth"));
-                    this.Dispose();
-                    throw new OperationCanceledException();
+                    break;
             }
         }
 

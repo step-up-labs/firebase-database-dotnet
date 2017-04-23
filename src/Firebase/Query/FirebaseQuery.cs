@@ -11,6 +11,7 @@ namespace Firebase.Database.Query
     using Firebase.Database.Streaming;
 
     using Newtonsoft.Json;
+    using System.Net;
 
     /// <summary>
     /// Represents a firebase query. 
@@ -62,10 +63,12 @@ namespace Firebase.Database.Query
         {
             var path = await this.BuildUrlAsync().ConfigureAwait(false);
             var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
 
             try
             {
                 var response = await this.GetClient().GetAsync(path).ConfigureAwait(false);
+                statusCode = response.StatusCode;
                 responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
@@ -74,7 +77,7 @@ namespace Firebase.Database.Query
             }
             catch(Exception ex)
             {
-                throw new FirebaseException(path, string.Empty, responseData, ex);
+                throw new FirebaseException(path, string.Empty, responseData, statusCode, ex);
             }
         }
 
@@ -172,17 +175,19 @@ namespace Firebase.Database.Query
             var c = this.GetClient();
             var url = await this.BuildUrlAsync().ConfigureAwait(false);
             var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
 
             try
             {
                 var result = await c.DeleteAsync(url).ConfigureAwait(false);
+                statusCode = result.StatusCode;
                 responseData = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 result.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                throw new FirebaseException(url, string.Empty, responseData, ex);
+                throw new FirebaseException(url, string.Empty, responseData, statusCode, ex);
             }
         }
 
@@ -233,10 +238,12 @@ namespace Firebase.Database.Query
             };
 
             var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
 
             try
             {
                 var result = await client.SendAsync(message).ConfigureAwait(false);
+                statusCode = result.StatusCode;
                 responseData = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 result.EnsureSuccessStatusCode();
@@ -245,7 +252,7 @@ namespace Firebase.Database.Query
             }
             catch(Exception ex)
             {
-                throw new FirebaseException(url, requestData, responseData, ex);
+                throw new FirebaseException(url, requestData, responseData, statusCode, ex);
             }
         }
     }
