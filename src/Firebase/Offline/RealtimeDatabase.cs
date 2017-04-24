@@ -155,7 +155,9 @@
                 this.observable = initialData
                     .Merge(this.subject)
                     .Merge(this.GetInitialPullObservable()
-                            .RetryAfterDelay(TimeSpan.FromSeconds(10))
+                            .RetryAfterDelay<IReadOnlyCollection<FirebaseObject<T>>, FirebaseException>(
+                                this.childQuery.Client.Options.SyncPeriod, 
+                                ex => ex.StatusCode == System.Net.HttpStatusCode.OK) // OK implies the request couldn't complete due to network error. 
                             .SelectMany(e => e)
                             .Do(this.SetObjectFromInitialPull)
                             .Select(e => new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online))

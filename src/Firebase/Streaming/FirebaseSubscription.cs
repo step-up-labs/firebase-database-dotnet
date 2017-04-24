@@ -136,7 +136,7 @@ namespace Firebase.Database.Streaming
                 {
                     break;
                 }
-                catch (Exception ex) when (statusCode == HttpStatusCode.Unauthorized)
+                catch (Exception ex) when (statusCode != HttpStatusCode.OK)
                 {
                     this.observer.OnError(new FirebaseException(url, string.Empty, line, statusCode, ex));
                     this.Dispose();
