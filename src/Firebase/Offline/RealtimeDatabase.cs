@@ -16,6 +16,7 @@
     using Internals;
     using Newtonsoft.Json;
     using System.Reflection;
+    using System.Reactive.Disposables;
 
     /// <summary>
     /// The real-time Database which synchronizes online and offline data. 
@@ -31,6 +32,7 @@
         private readonly bool pushChanges;
         private readonly FirebaseCache<T> firebaseCache;
 
+        private bool isSyncRunning;
         private IObservable<FirebaseEvent<T>> observable;
 
         /// <summary>
@@ -56,6 +58,7 @@
 
             this.PutHandler = new SetHandler<T>();
 
+            this.isSyncRunning = true;
             Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
@@ -208,16 +211,18 @@
 
         private IDisposable InitializeStreamingSubscription(IObserver<FirebaseEvent<T>> observer)
         {
+            var completeDisposable = Disposable.Create(() => this.isSyncRunning = false);
+
             if (this.streamChanges)
             {
                 var query = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
                 var sub = new FirebaseSubscription<T>(observer, query, this.elementRoot, this.firebaseCache);
                 sub.ExceptionThrown += this.StreamingExceptionThrown;
 
-                return sub.Run();
-            } 
-                
-            return Observable.Never<string>().Subscribe();
+                return new CompositeDisposable(sub.Run(), completeDisposable);
+            }
+
+            return completeDisposable;
         }
 
         private void SetAndRaise(string key, OfflineEntry obj, FirebaseEventSource eventSource = FirebaseEventSource.Offline)
@@ -228,7 +233,7 @@
 
         private async void SynchronizeThread()
         {
-            while (true)
+            while (this.isSyncRunning)
             {
                 try
                 {
