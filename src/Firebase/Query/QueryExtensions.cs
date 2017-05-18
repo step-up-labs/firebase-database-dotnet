@@ -142,7 +142,7 @@ namespace Firebase.Database.Query
 
         public static async Task<FirebaseObject<T>> PostAsync<T>(this FirebaseQuery query, T obj, bool generateKeyOffline = true)
         {
-            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings));
+            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings), generateKeyOffline);
 
             return new FirebaseObject<T>(result.Key, obj);
         }
