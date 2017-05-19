@@ -108,7 +108,6 @@ namespace Firebase.Database.Streaming
 
                             if (string.IsNullOrWhiteSpace(line))
                             {
-                                await Task.Delay(2000).ConfigureAwait(false);
                                 continue;
                             }
 
