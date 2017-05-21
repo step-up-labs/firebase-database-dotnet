@@ -345,5 +345,42 @@
                 ["b"] = "bb",
             }));
         }
+
+
+
+        [TestMethod]
+        public void InitialPushOfEntireArrayToEmptyCache()
+        {
+            // Data that looks like an array will be returned as an array (without keys).
+            // https://firebase.googleblog.com/2014/04/best-practices-arrays-in-firebase.html
+
+            // this should simulate first time connection is made and all data is returned in a batch in a form of a dictionary
+            var cache = new FirebaseCache<Dinosaur>();
+            var dinosaurs = @"[
+  {
+    ""ds"": {
+      ""height"" : 2,
+      ""length"" : 2,
+      ""weight"": 2
+    }
+  },
+  {
+    ""ds"": {
+      ""height"" : 3,
+      ""length"" : 3,
+      ""weight"" : 3
+    }
+  }
+]";
+
+            var entities = cache.PushData("/", dinosaurs).ToList();
+            var expectation = new[]
+            {
+                new FirebaseObject<Dinosaur>("0", new Dinosaur(2, 2, 2)),
+                new FirebaseObject<Dinosaur>("1", new Dinosaur(3, 3, 3))
+            };
+
+            entities.ShouldAllBeEquivalentTo(expectation);
+        }
     }
 }
