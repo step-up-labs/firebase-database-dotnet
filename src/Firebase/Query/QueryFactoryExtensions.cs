@@ -13,7 +13,7 @@ namespace Firebase.Database.Query
         /// <param name="node"> The child. </param>
         /// <param name="tokenFactory"> The auth token. </param>
         /// <returns> The <see cref="AuthQuery"/>. </returns>
-        public static AuthQuery WithAuth(this FirebaseQuery node, Func<string> tokenFactory)
+        internal static AuthQuery WithAuth(this FirebaseQuery node, Func<string> tokenFactory)
         {
             return new AuthQuery(node, tokenFactory, node.Client);
         }
