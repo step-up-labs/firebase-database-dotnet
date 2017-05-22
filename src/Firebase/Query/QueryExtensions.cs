@@ -107,6 +107,27 @@ namespace Firebase.Database.Query
         {
             return child.EqualTo(() => value);
         }
+        
+        /// <summary>
+        /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// </summary>
+        /// <param name="child"> Current node. </param>
+        /// <param name="value"> Value to start at. </param>
+        /// <returns> The <see cref="FilterQuery"/>. </returns>
+        public static FilterQuery EqualTo(this ParameterQuery child, bool value)
+        {
+            return child.EqualTo(() => value);
+        }  
+
+        /// <summary>
+        /// Instructs firebase to send data equal to null. This must be preceded by an OrderBy query.
+        /// </summary>
+        /// <param name="child"> Current node. </param>
+        /// <returns> The <see cref="FilterQuery"/>. </returns>
+        public static FilterQuery EqualTo(this ParameterQuery child)
+        {
+            return child.EqualTo(() => null);
+        }        
 
         /// <summary>
         /// Limits the result to first <see cref="count"/> items.
