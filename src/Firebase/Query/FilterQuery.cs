@@ -10,6 +10,7 @@ namespace Firebase.Database.Query
     {
         private readonly Func<string> valueFactory;
         private readonly Func<double> doubleValueFactory;
+        private readonly Func<bool> boolValueFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterQuery"/> class.
@@ -38,6 +39,19 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="FilterQuery"/> class.
+        /// </summary>
+        /// <param name="parent"> The parent. </param>
+        /// <param name="filterFactory"> The filter. </param>
+        /// <param name="valueFactory"> The value for filter. </param>
+        /// <param name="client"> The owning client. </param>
+        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<bool> valueFactory, FirebaseClient client)
+            : base(parent, filterFactory, client)
+        {
+            this.boolValueFactory = valueFactory;
+        }
+
+        /// <summary>
         /// The build url parameter.
         /// </summary>
         /// <param name="child"> The child. </param> 
@@ -46,11 +60,19 @@ namespace Firebase.Database.Query
         {
             if (this.valueFactory != null)
             {
+                if(this.valueFactory() == null)
+                {
+                    return $"null";
+                }
                 return $"\"{this.valueFactory()}\"";
             }
             else if (this.doubleValueFactory != null)
             {
                 return this.doubleValueFactory().ToString(CultureInfo.InvariantCulture);
+            }
+            else if (this.boolValueFactory != null)
+            {
+                return $"{this.boolValueFactory().ToString().ToLower()}";
             }
 
             return string.Empty;
