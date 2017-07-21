@@ -112,7 +112,7 @@
                 }
             }
 
-            var setObject = this.firebaseCache.PushData(fullKey.Item1, serializedObject).First();
+            var setObject = this.firebaseCache.PushData(this.elementRoot + "/" + fullKey.Item1, serializedObject).First();
 
             if (!this.Database.ContainsKey(key) || this.Database[key].SyncOptions != SyncOptions.Patch && this.Database[key].SyncOptions != SyncOptions.Put)
             {
@@ -273,10 +273,7 @@
 
             foreach (var group in groups)
             {
-                var tasks = group.Select(kvp => 
-                    this.PutHandler
-                        .SetAsync(this.childQuery, kvp.Key, kvp.Value)
-                        .ContinueWith(t => this.ResetSyncOptions(kvp.Key), TaskContinuationOptions.OnlyOnRanToCompletion));
+                var tasks = group.Select(kvp => this.ResetSyncAfterTask(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key));
 
                 try
                 {
@@ -314,6 +311,12 @@
             this.SetAndRaise(key, new OfflineEntry(key, task.Result, entry.Priority, SyncOptions.None), FirebaseEventSource.Online);
         }
 
+        private async Task ResetSyncAfterTask(Task task, string key)
+        {
+            await task;
+            this.ResetSyncOptions(key);
+        }
+
         private void ResetSyncOptions(string key)
         {
             var item = this.Database[key];
@@ -339,14 +342,15 @@
             var visitor = new MemberAccessVisitor();
             visitor.Visit(propertyGetter);
             var propertyType = typeof(TProperty).GetTypeInfo();
+            var prefix = key == string.Empty ? string.Empty : key + "/";
 
             // primitive types
             if (syncOptions == SyncOptions.Patch && (propertyType.IsPrimitive || Nullable.GetUnderlyingType(typeof(TProperty)) != null || typeof(TProperty) == typeof(string)))
             {
-                return Tuple.Create(key + "/" + string.Join("/", visitor.PropertyNames.Skip(1).Reverse()), visitor.PropertyNames.First(), true);
+                return Tuple.Create(prefix + string.Join("/", visitor.PropertyNames.Skip(1).Reverse()), visitor.PropertyNames.First(), true);
             }
 
-            return Tuple.Create(key + "/" + string.Join("/", visitor.PropertyNames.Reverse()), visitor.PropertyNames.First(), false);
+            return Tuple.Create(prefix + string.Join("/", visitor.PropertyNames.Reverse()), visitor.PropertyNames.First(), false);
         }
     }
 }
