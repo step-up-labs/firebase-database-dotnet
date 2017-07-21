@@ -1,5 +1,6 @@
 ﻿namespace Firebase.Database.Extensions
 {
+    using System;
     using System.Threading.Tasks;
 
     public static class TaskExtensions
@@ -13,9 +14,9 @@
             {
                 await source.ConfigureAwait(false);
             }
-            catch
+            catch (Exception ex)
             {
-                throw source.Exception;
+                throw source.Exception ?? ex;
             }
         }
     }
