@@ -48,9 +48,18 @@ namespace Firebase.Database.Query
         /// <returns> Collection of <see cref="FirebaseObject{T}"/> holding the entities returned by server. </returns>
         public async Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsync<T>()
         {
-            var path = await this.BuildUrlAsync().ConfigureAwait(false);
+            var url = string.Empty;
 
-            return await this.GetClient().GetObjectCollectionAsync<T>(path).ConfigureAwait(false);
+            try
+            {
+                url = await this.BuildUrlAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
+            }
+
+            return await this.GetClient().GetObjectCollectionAsync<T>(url).ConfigureAwait(false);
         }
 
 
@@ -61,13 +70,22 @@ namespace Firebase.Database.Query
         /// <returns> Single object of type <typeparamref name="T"/>. </returns>
         public async Task<T> OnceSingleAsync<T>()
         {
-            var path = await this.BuildUrlAsync().ConfigureAwait(false);
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
+            var url = string.Empty;
 
             try
             {
-                var response = await this.GetClient().GetAsync(path).ConfigureAwait(false);
+                url = await this.BuildUrlAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException("Couldn't build the url", string.Empty, responseData, statusCode, ex);
+            }
+
+            try
+            {
+                var response = await this.GetClient().GetAsync(url).ConfigureAwait(false);
                 statusCode = response.StatusCode;
                 responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -77,7 +95,7 @@ namespace Firebase.Database.Query
             }
             catch(Exception ex)
             {
-                throw new FirebaseException(path, string.Empty, responseData, statusCode, ex);
+                throw new FirebaseException(url, string.Empty, responseData, statusCode, ex);
             }
         }
 
@@ -173,9 +191,18 @@ namespace Firebase.Database.Query
         public async Task DeleteAsync()
         {
             var c = this.GetClient();
-            var url = await this.BuildUrlAsync().ConfigureAwait(false);
+            var url = string.Empty;
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
+
+            try
+            {
+                url = await this.BuildUrlAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException("Couldn't build the url", string.Empty, responseData, statusCode, ex);
+            }
 
             try
             {
@@ -230,16 +257,25 @@ namespace Firebase.Database.Query
 
         private async Task<string> SendAsync(HttpClient client, string data, HttpMethod method)
         {
-            var url = await this.BuildUrlAsync().ConfigureAwait(false);
+            var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
             var requestData = data;
+            var url = string.Empty;
+
+            try
+            {
+                url = await this.BuildUrlAsync().ConfigureAwait(false);
+            } 
+            catch (Exception ex)
+            {
+                throw new FirebaseException("Couldn't build the url", requestData, responseData, statusCode, ex);
+            }
+
             var message = new HttpRequestMessage(method, url)
             {
                 Content = new StringContent(requestData)
             };
-
-            var responseData = string.Empty;
-            var statusCode = HttpStatusCode.OK;
-
+         
             try
             {
                 var result = await client.SendAsync(message).ConfigureAwait(false);
