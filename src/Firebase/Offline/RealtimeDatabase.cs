@@ -139,6 +139,44 @@
             }
         }
 
+        /// <summary>
+        /// Fetches everything from the remote database.
+        /// </summary>
+        public async Task PullAsync()
+        {
+            var existingEntries = await this.childQuery
+                .OnceAsync<T>()
+                .ToObservable()
+                .RetryAfterDelay<IReadOnlyCollection<FirebaseObject<T>>, FirebaseException>(
+                    this.childQuery.Client.Options.SyncPeriod,
+                    ex => ex.StatusCode == System.Net.HttpStatusCode.OK) // OK implies the request couldn't complete due to network error. 
+                .SelectMany(e => e)
+                .Do(e => 
+                {
+                    this.Database[e.Key] = new OfflineEntry(e.Key, e.Object, 1, SyncOptions.None);
+                    this.subject.OnNext(new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online));
+                })
+                .ToList();
+
+            // Remove items not stored online
+            foreach (var item in this.Database.Keys.Except(existingEntries.Select(f => f.Key)).ToList())
+            {
+                this.Database.Remove(item);
+                this.subject.OnNext(new FirebaseEvent<T>(item, null, FirebaseEventType.Delete, FirebaseEventSource.Online));
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all offline items currently stored in local database.
+        /// </summary>
+        public IEnumerable<FirebaseObject<T>> Once()
+        {
+            return this.Database
+                .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Data) && kvp.Value.Data != "null" && !kvp.Value.IsPartial)
+                .Select(kvp => new FirebaseObject<T>(kvp.Key, kvp.Value.Deserialize<T>()))
+                .ToList();
+        }
+
         /// <summary> 
         /// Starts observing the real-time Database. Events will be fired both when change is done locally and remotely.
         /// </summary> 
@@ -273,7 +311,7 @@
 
             foreach (var group in groups)
             {
-                var tasks = group.Select(kvp => this.ResetSyncAfterTask(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key));
+                var tasks = group.OrderBy(kvp => kvp.Value.IsPartial).Select(kvp => this.ResetSyncAfterTask(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key));
 
                 try
                 {
