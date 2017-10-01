@@ -146,7 +146,8 @@ namespace Firebase.Database.Streaming
                 }
                 else
                 {
-                    JsonConvert.PopulateObject(data, obj);
+                    var serializerSettings = new JsonSerializerSettings {ObjectCreationHandling = ObjectCreationHandling.Replace};                    
+                    JsonConvert.PopulateObject(data, obj, serializerSettings);
                 }
 
                 this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
