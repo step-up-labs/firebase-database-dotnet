@@ -45,7 +45,7 @@
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server.  </param>
         /// <param name="pullEverythingOnStart"> Specifies if everything should be pull from the online storage on start. It only makes sense when <see cref="streamChanges"/> is set to true. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. If this is false, then Put / Post / Delete will not affect server data. </param>
-        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, InitialPullStrategy initialPullStrategy, bool pushChanges)
+        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, InitialPullStrategy initialPullStrategy, bool pushChanges, ISetHandler<T> setHandler = null)
         {
             this.childQuery = childQuery;
             this.elementRoot = elementRoot;
@@ -56,7 +56,7 @@
             this.firebaseCache = new FirebaseCache<T>(new OfflineCacheAdapter<string, T>(this.Database));
             this.subject = new Subject<FirebaseEvent<T>>();
 
-            this.PutHandler = new SetHandler<T>();
+            this.PutHandler = setHandler ?? new SetHandler<T>();
 
             this.isSyncRunning = true;
             Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
@@ -133,8 +133,9 @@
             {
                 this.Database[key] = new OfflineEntry(key, null, priority, SyncOptions.Pull);
             }
-            else
+            else if (this.Database[key].SyncOptions == SyncOptions.None)
             {
+                // pull only if push isn't pending
                 this.Database[key].SyncOptions = SyncOptions.Pull;
             }
         }
