@@ -168,7 +168,7 @@ namespace Firebase.Database.Query
         {
             var c = this.GetClient();
 
-            await this.SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
+            await this.Silent().SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace Firebase.Database.Query
         {
             var c = this.GetClient();
 
-            await this.SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
+            await this.Silent().SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
         }
 
         /// <summary>

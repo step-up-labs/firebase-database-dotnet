@@ -20,6 +20,16 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
+        /// Appends print=silent to save bandwidth.
+        /// </summary>
+        /// <param name="node"> The child. </param>
+        /// <returns> The <see cref="SilentQuery"/>. </returns>
+        internal static SilentQuery Silent(this FirebaseQuery node)
+        {
+            return new SilentQuery(node, node.Client);
+        }
+
+        /// <summary>
         /// References a sub child of the existing node.
         /// </summary>
         /// <param name="node"> The child. </param>
