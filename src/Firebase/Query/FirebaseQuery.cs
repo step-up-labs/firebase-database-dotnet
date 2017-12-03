@@ -59,7 +59,8 @@ namespace Firebase.Database.Query
                 throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
             }
 
-            return await this.GetClient().GetObjectCollectionAsync<T>(url).ConfigureAwait(false);
+            return await this.GetClient().GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
+                .ConfigureAwait(false);
         }
 
 
@@ -91,7 +92,7 @@ namespace Firebase.Database.Query
 
                 response.EnsureSuccessStatusCode();
 
-                return JsonConvert.DeserializeObject<T>(responseData);
+                return JsonConvert.DeserializeObject<T>(responseData, Client.Options.JsonSerializerSettings);
             }
             catch(Exception ex)
             {
@@ -152,7 +153,7 @@ namespace Firebase.Database.Query
             {
                 var c = this.GetClient();
                 var sendData = await this.SendAsync(c, data, HttpMethod.Post).ConfigureAwait(false);
-                var result = JsonConvert.DeserializeObject<PostResult>(sendData);
+                var result = JsonConvert.DeserializeObject<PostResult>(sendData, Client.Options.JsonSerializerSettings);
 
                 return new FirebaseObject<string>(result.Name, data);
             }
