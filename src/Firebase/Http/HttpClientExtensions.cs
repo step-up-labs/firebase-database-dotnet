@@ -20,9 +20,11 @@ namespace Firebase.Database.Http
         /// </summary>
         /// <param name="client"> The client. </param>
         /// <param name="requestUri"> The request uri. </param>  
+        /// <param name="jsonSerializerSettings"> The specific JSON Serializer Settings. </param>  
         /// <typeparam name="T"> The type of entities the collection should contain. </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(this HttpClient client, string requestUri)
+        public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(this HttpClient client, string requestUri,
+            JsonSerializerSettings jsonSerializerSettings)
         {
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
@@ -35,7 +37,7 @@ namespace Firebase.Database.Http
 
                 response.EnsureSuccessStatusCode();
 
-                var dictionary = JsonConvert.DeserializeObject<Dictionary<string, T>>(responseData);
+                var dictionary = JsonConvert.DeserializeObject<Dictionary<string, T>>(responseData, jsonSerializerSettings);
 
                 if (dictionary == null)
                 {
