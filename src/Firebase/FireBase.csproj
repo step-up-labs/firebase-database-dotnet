@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
     <PackageId>FirebaseDatabase.net</PackageId>
-    <PackageVersion>3.2.0</PackageVersion>
+    <PackageVersion>3.2.1</PackageVersion>
     <Authors>Step Up Labs, Inc.</Authors>
     <Description>Complex C# library for Firebase Realtime Database built on top of Firebase REST API. Among others it supports following:
 
@@ -21,7 +21,7 @@
     <PackageLicenseUrl>https://github.com/step-up-labs/firebase-authentication-dotnet/blob/master/LICENSE</PackageLicenseUrl>
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
-    <Copyright>Step Up Labs, Inc. 2016</Copyright>
+    <Copyright>Step Up Labs, Inc. 2017</Copyright>
     <PackageTags>Firebase Database Realtime</PackageTags>
   </PropertyGroup>
 

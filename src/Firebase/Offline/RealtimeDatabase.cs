@@ -312,7 +312,7 @@
 
             foreach (var group in groups)
             {
-                var tasks = group.OrderBy(kvp => kvp.Value.IsPartial).Select(kvp => this.ResetSyncAfterTask(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key));
+                var tasks = group.OrderBy(kvp => kvp.Value.IsPartial).Select(kvp => this.ResetSyncAfterPush(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key, kvp.Value.Deserialize<T>()));
 
                 try
                 {
@@ -331,7 +331,7 @@
 
             foreach (var group in taskGroups)
             {
-                var tasks = group.Select(pair => this.ResetAfterTask(this.childQuery.Child(pair.Key).OnceSingleAsync<T>(), pair.Key, pair.Value));
+                var tasks = group.Select(pair => this.ResetAfterPull(this.childQuery.Child(pair.Key).OnceSingleAsync<T>(), pair.Key, pair.Value));
 
                 try
                 { 
@@ -344,16 +344,20 @@
             }
         }
 
-        private async Task ResetAfterTask(Task<T> task, string key, OfflineEntry entry)
+        private async Task ResetAfterPull(Task<T> task, string key, OfflineEntry entry)
         {
             await task;
             this.SetAndRaise(key, new OfflineEntry(key, task.Result, entry.Priority, SyncOptions.None), FirebaseEventSource.Online);
         }
 
-        private async Task ResetSyncAfterTask(Task task, string key)
+        private async Task ResetSyncAfterPush(Task task, string key, T obj)
         {
             await task;
             this.ResetSyncOptions(key);
+            if (!this.streamChanges)
+            {
+                this.subject.OnNext(new FirebaseEvent<T>(key, obj, obj == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online));
+            }
         }
 
         private void ResetSyncOptions(string key)
