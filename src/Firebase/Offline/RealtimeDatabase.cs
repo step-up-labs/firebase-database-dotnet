@@ -312,7 +312,10 @@
 
             foreach (var group in groups)
             {
-                var tasks = group.OrderBy(kvp => kvp.Value.IsPartial).Select(kvp => this.ResetSyncAfterPush(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key, kvp.Value.Deserialize<T>()));
+                var tasks = group.OrderBy(kvp => kvp.Value.IsPartial).Select(kvp => 
+                    kvp.Value.IsPartial ?
+                    this.ResetSyncAfterPush(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key) :
+                    this.ResetSyncAfterPush(this.PutHandler.SetAsync(this.childQuery, kvp.Key, kvp.Value), kvp.Key, kvp.Value.Deserialize<T>()));
 
                 try
                 {
@@ -352,12 +355,18 @@
 
         private async Task ResetSyncAfterPush(Task task, string key, T obj)
         {
-            await task;
-            this.ResetSyncOptions(key);
+            await this.ResetSyncAfterPush(task, key);
+
             if (!this.streamChanges)
             {
                 this.subject.OnNext(new FirebaseEvent<T>(key, obj, obj == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online));
             }
+        }
+
+        private async Task ResetSyncAfterPush(Task task, string key)
+        {
+            await task;
+            this.ResetSyncOptions(key);
         }
 
         private void ResetSyncOptions(string key)
