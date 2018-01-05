@@ -24,7 +24,7 @@
         /// </summary>
         /// <typeparam name="T"> Type of the items. </typeparam>
         /// <returns> Collection of <see cref="FirebaseObject{T}"/>. </returns> 
-        Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsync<T>();
+        Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsync<T>(int timeoutSecs = 100);
 
         /// <summary>
         /// Returns current location as an observable which allows to real-time listening to events from the firebase server. 
