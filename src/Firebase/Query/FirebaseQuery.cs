@@ -46,7 +46,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <returns> Collection of <see cref="FirebaseObject{T}"/> holding the entities returned by server. </returns>
-        public async Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsync<T>()
+        public async Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsync<T>(int timeoutSecs = 100)
         {
             var url = string.Empty;
 
@@ -59,7 +59,7 @@ namespace Firebase.Database.Query
                 throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
             }
 
-            return await this.GetClient().GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
+            return await this.GetClient(timeoutSecs).GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
                 .ConfigureAwait(false);
         }
 
@@ -69,7 +69,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <returns> Single object of type <typeparamref name="T"/>. </returns>
-        public async Task<T> OnceSingleAsync<T>()
+        public async Task<T> OnceSingleAsync<T>(int timeoutSecs = 100)
         {
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
@@ -86,7 +86,7 @@ namespace Firebase.Database.Query
 
             try
             {
-                var response = await this.GetClient().GetAsync(url).ConfigureAwait(false);
+                var response = await this.GetClient(timeoutSecs).GetAsync(url).ConfigureAwait(false);
                 statusCode = response.StatusCode;
                 responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -139,7 +139,7 @@ namespace Firebase.Database.Query
         /// <param name="generateKeyOffline"> Specifies whether the key should be generated offline instead of online. </param> 
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> Resulting firebase object with populated key. </returns>
-        public async Task<FirebaseObject<string>> PostAsync(string data, bool generateKeyOffline = true)
+        public async Task<FirebaseObject<string>> PostAsync(string data, bool generateKeyOffline = true, int timeoutSecs = 100)
         {
             // post generates a new key server-side, while put can be used with an already generated local key
             if (generateKeyOffline)
@@ -151,7 +151,7 @@ namespace Firebase.Database.Query
             }
             else
             {
-                var c = this.GetClient();
+                var c = this.GetClient(timeoutSecs);
                 var sendData = await this.SendAsync(c, data, HttpMethod.Post).ConfigureAwait(false);
                 var result = JsonConvert.DeserializeObject<PostResult>(sendData, Client.Options.JsonSerializerSettings);
 
@@ -165,9 +165,9 @@ namespace Firebase.Database.Query
         /// <param name="obj"> The object. </param>  
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PatchAsync(string data)
+        public async Task PatchAsync(string data, int timeoutSecs = 100)
         {
-            var c = this.GetClient();
+            var c = this.GetClient(timeoutSecs);
 
             await this.Silent().SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
         }
@@ -178,9 +178,9 @@ namespace Firebase.Database.Query
         /// <param name="obj"> The object. </param>  
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PutAsync(string data)
+        public async Task PutAsync(string data, int timeoutSecs = 100)
         {
-            var c = this.GetClient();
+            var c = this.GetClient(timeoutSecs);
 
             await this.Silent().SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
         }
@@ -189,9 +189,9 @@ namespace Firebase.Database.Query
         /// Deletes data from given location.
         /// </summary>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task DeleteAsync()
+        public async Task DeleteAsync(int timeoutSecs = 100)
         {
-            var c = this.GetClient();
+            var c = this.GetClient(timeoutSecs);
             var url = string.Empty;
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
@@ -246,11 +246,13 @@ namespace Firebase.Database.Query
             return url;
         }
 
-        private HttpClient GetClient()
+        private HttpClient GetClient(int timeoutSecs = 100)
         {
             if (this.client == null)
             {
-                this.client = new HttpClient();
+                this.client = new HttpClient() {
+                    Timeout = TimeSpan.FromSeconds(timeoutSecs)
+                };
             }
 
             return this.client;
