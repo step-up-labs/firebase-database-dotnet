@@ -308,7 +308,7 @@
 
         private async Task PushEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pushEntries)
         {
-            var groups = pushEntries.GroupBy(pair => pair.Value.Priority).OrderBy(kvp => kvp.Key).ToList();
+            var groups = pushEntries.GroupBy(pair => pair.Value.Priority).OrderByDescending(kvp => kvp.Key).ToList();
 
             foreach (var group in groups)
             {
@@ -330,7 +330,7 @@
 
         private async Task PullEntriesAsync(IEnumerable<KeyValuePair<string, OfflineEntry>> pullEntries)
         {
-            var taskGroups = pullEntries.GroupBy(pair => pair.Value.Priority).OrderBy(kvp => kvp.Key);
+            var taskGroups = pullEntries.GroupBy(pair => pair.Value.Priority).OrderByDescending(kvp => kvp.Key);
 
             foreach (var group in taskGroups)
             {
