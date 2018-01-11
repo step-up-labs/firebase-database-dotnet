@@ -184,6 +184,12 @@
         /// <returns> Stream of <see cref="FirebaseEvent{T}"/>. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable()
         {
+            if (!this.isSyncRunning)
+            {
+                this.isSyncRunning = true;
+                Task.Factory.StartNew(this.SynchronizeThread, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }
+
             if (this.observable == null)
             {
                 var initialData = this.Database.Count == 0
