@@ -10,6 +10,8 @@
     {
         private readonly IList<string> propertyNames = new List<string>();
 
+        private bool wasDictionaryAccess;
+
         public IEnumerable<string> PropertyNames => this.propertyNames;
 
         public MemberAccessVisitor()
@@ -20,10 +22,17 @@
         {
             if (expr?.NodeType == ExpressionType.MemberAccess)
             {
-                var memberExpr = (MemberExpression)expr;
-                var jsonAttr = memberExpr.Member.GetCustomAttribute<JsonPropertyAttribute>();
-                
-                this.propertyNames.Add(jsonAttr?.PropertyName ?? memberExpr.Member.Name);
+                if (this.wasDictionaryAccess)
+                {
+                    this.wasDictionaryAccess = false;
+                }
+                else
+                {
+                    var memberExpr = (MemberExpression)expr;
+                    var jsonAttr = memberExpr.Member.GetCustomAttribute<JsonPropertyAttribute>();
+
+                    this.propertyNames.Add(jsonAttr?.PropertyName ?? memberExpr.Member.Name);
+                }
             }
             else if (expr?.NodeType == ExpressionType.Call)
             {
@@ -32,6 +41,7 @@
                 {
                     var e = Expression.Lambda(callExpr.Arguments[0]).Compile();
                     this.propertyNames.Add(e.DynamicInvoke().ToString());
+                    this.wasDictionaryAccess = callExpr.Arguments[0].NodeType == ExpressionType.MemberAccess;
                 }
             }
 
