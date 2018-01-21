@@ -61,6 +61,9 @@ As you can se, the AuthTokenAsyncFactory is of type `Func<Task<string>>`. This i
 ### Querying
 
 ```csharp
+using Firebase.Database;
+using Firebase.Database.Query;
+...
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var dinos = await firebase
   .Child("dinosaurs")
@@ -78,6 +81,9 @@ foreach (var dino in dinos)
 ### Saving & deleting data
 
 ```csharp
+using Firebase.Database;
+using Firebase.Database.Query;
+...
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 
 // add new item to list of data and let the client generate new key for you (done offline)
@@ -105,6 +111,9 @@ await firebase
 ### Realtime streaming
 
 ```csharp
+using Firebase.Database;
+using Firebase.Database.Query;
+...
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var observable = firebase
   .Child("dinosaurs")
