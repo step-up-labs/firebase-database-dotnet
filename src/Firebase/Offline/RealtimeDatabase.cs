@@ -25,8 +25,8 @@
     public partial class RealtimeDatabase<T> where T : class
     {
         private readonly ChildQuery childQuery;
-        private readonly bool streamChanges;
         private readonly string elementRoot;
+        private readonly StreamingOptions streamingOptions;
         private readonly Subject<FirebaseEvent<T>> subject;
         private readonly InitialPullStrategy initialPullStrategy;
         private readonly bool pushChanges;
@@ -45,11 +45,11 @@
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server.  </param>
         /// <param name="pullEverythingOnStart"> Specifies if everything should be pull from the online storage on start. It only makes sense when <see cref="streamChanges"/> is set to true. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. If this is false, then Put / Post / Delete will not affect server data. </param>
-        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, bool streamChanges, InitialPullStrategy initialPullStrategy, bool pushChanges, ISetHandler<T> setHandler = null)
+        public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, StreamingOptions streamingOptions, InitialPullStrategy initialPullStrategy, bool pushChanges, ISetHandler<T> setHandler = null)
         {
             this.childQuery = childQuery;
             this.elementRoot = elementRoot;
-            this.streamChanges = streamChanges;
+            this.streamingOptions = streamingOptions;
             this.initialPullStrategy = initialPullStrategy;
             this.pushChanges = pushChanges;
             this.Database = offlineDatabaseFactory(typeof(T), filenameModifier);
@@ -259,13 +259,24 @@
         {
             var completeDisposable = Disposable.Create(() => this.isSyncRunning = false);
 
-            if (this.streamChanges)
+            switch (this.streamingOptions)
             {
-                var query = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
-                var sub = new FirebaseSubscription<T>(observer, query, this.elementRoot, this.firebaseCache);
-                sub.ExceptionThrown += this.StreamingExceptionThrown;
+                case StreamingOptions.LatestOnly:
+                    // stream since the latest key
+                    var queryLatest = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
+                    var subLatest = new FirebaseSubscription<T>(observer, queryLatest, this.elementRoot, this.firebaseCache);
+                    subLatest.ExceptionThrown += this.StreamingExceptionThrown;
 
-                return new CompositeDisposable(sub.Run(), completeDisposable);
+                    return new CompositeDisposable(subLatest.Run(), completeDisposable);
+                case StreamingOptions.Everything:
+                    // stream everything
+                    var queryAll = this.childQuery;
+                    var subAll = new FirebaseSubscription<T>(observer, queryAll, this.elementRoot, this.firebaseCache);
+                    subAll.ExceptionThrown += this.StreamingExceptionThrown;
+
+                    return new CompositeDisposable(subAll.Run(), completeDisposable);
+                default:
+                    break;
             }
 
             return completeDisposable;
@@ -363,7 +374,7 @@
         {
             await this.ResetSyncAfterPush(task, key);
 
-            if (!this.streamChanges)
+            if (this.streamingOptions == StreamingOptions.None)
             {
                 this.subject.OnNext(new FirebaseEvent<T>(key, obj, obj == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online));
             }
