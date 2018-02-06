@@ -22,7 +22,7 @@
     /// The real-time Database which synchronizes online and offline data. 
     /// </summary>
     /// <typeparam name="T"> Type of entities. </typeparam>
-    public partial class RealtimeDatabase<T> where T : class
+    public partial class RealtimeDatabase<T> : IDisposable where T : class
     {
         private readonly ChildQuery childQuery;
         private readonly string elementRoot;
@@ -34,6 +34,7 @@
 
         private bool isSyncRunning;
         private IObservable<FirebaseEvent<T>> observable;
+        private FirebaseSubscription<T> firebaseSubscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RealtimeDatabase{T}"/> class.
@@ -218,6 +219,12 @@
             return this.observable;
         }
 
+        public void Dispose()
+        {
+            this.subject.OnCompleted();
+            this.firebaseSubscription.Dispose();
+        }
+
         private void SetObjectFromInitialPull(FirebaseObject<T> e)
         {
             // set object with no sync only if it doesn't exist yet 
@@ -264,17 +271,17 @@
                 case StreamingOptions.LatestOnly:
                     // stream since the latest key
                     var queryLatest = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
-                    var subLatest = new FirebaseSubscription<T>(observer, queryLatest, this.elementRoot, this.firebaseCache);
-                    subLatest.ExceptionThrown += this.StreamingExceptionThrown;
+                    this.firebaseSubscription = new FirebaseSubscription<T>(observer, queryLatest, this.elementRoot, this.firebaseCache);
+                    this.firebaseSubscription.ExceptionThrown += this.StreamingExceptionThrown;
 
-                    return new CompositeDisposable(subLatest.Run(), completeDisposable);
+                    return new CompositeDisposable(this.firebaseSubscription.Run(), completeDisposable);
                 case StreamingOptions.Everything:
                     // stream everything
                     var queryAll = this.childQuery;
-                    var subAll = new FirebaseSubscription<T>(observer, queryAll, this.elementRoot, this.firebaseCache);
-                    subAll.ExceptionThrown += this.StreamingExceptionThrown;
+                    this.firebaseSubscription = new FirebaseSubscription<T>(observer, queryAll, this.elementRoot, this.firebaseCache);
+                    this.firebaseSubscription.ExceptionThrown += this.StreamingExceptionThrown;
 
-                    return new CompositeDisposable(subAll.Run(), completeDisposable);
+                    return new CompositeDisposable(this.firebaseSubscription.Run(), completeDisposable);
                 default:
                     break;
             }
@@ -421,5 +428,6 @@
 
             return Tuple.Create(prefix + string.Join("/", visitor.PropertyNames.Reverse()), visitor.PropertyNames.First(), false);
         }
+
     }
 }
