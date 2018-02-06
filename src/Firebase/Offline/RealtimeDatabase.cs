@@ -222,7 +222,7 @@
         public void Dispose()
         {
             this.subject.OnCompleted();
-            this.firebaseSubscription.Dispose();
+            this.firebaseSubscription?.Dispose();
         }
 
         private void SetObjectFromInitialPull(FirebaseObject<T> e)
