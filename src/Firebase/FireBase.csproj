@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
     <PackageId>FirebaseDatabase.net</PackageId>
-    <PackageVersion>3.3.2</PackageVersion>
+    <PackageVersion>3.3.3</PackageVersion>
     <Authors>Step Up Labs, Inc.</Authors>
     <Description>Complex C# library for Firebase Realtime Database built on top of Firebase REST API. Among others it supports following:
 

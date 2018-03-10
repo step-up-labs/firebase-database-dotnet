@@ -156,7 +156,7 @@
                 .Do(e => 
                 {
                     this.Database[e.Key] = new OfflineEntry(e.Key, e.Object, 1, SyncOptions.None);
-                    this.subject.OnNext(new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online));
+                    this.subject.OnNext(new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.OnlinePull));
                 })
                 .ToList();
 
@@ -164,7 +164,7 @@
             foreach (var item in this.Database.Keys.Except(existingEntries.Select(f => f.Key)).ToList())
             {
                 this.Database.Remove(item);
-                this.subject.OnNext(new FirebaseEvent<T>(item, null, FirebaseEventType.Delete, FirebaseEventSource.Online));
+                this.subject.OnNext(new FirebaseEvent<T>(item, null, FirebaseEventType.Delete, FirebaseEventSource.OnlinePull));
             }
         }
 
@@ -209,7 +209,7 @@
                                 ex => ex.StatusCode == System.Net.HttpStatusCode.OK) // OK implies the request couldn't complete due to network error. 
                             .SelectMany(e => e)
                             .Do(this.SetObjectFromInitialPull)
-                            .Select(e => new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online))
+                            .Select(e => new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.OnlineInitial))
                             .Concat(Observable.Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))))
                             .Do(next => { }, e => this.observable = null, () => this.observable = null)
                     .Replay()
@@ -374,7 +374,7 @@
         private async Task ResetAfterPull(Task<T> task, string key, OfflineEntry entry)
         {
             await task;
-            this.SetAndRaise(key, new OfflineEntry(key, task.Result, entry.Priority, SyncOptions.None), FirebaseEventSource.Online);
+            this.SetAndRaise(key, new OfflineEntry(key, task.Result, entry.Priority, SyncOptions.None), FirebaseEventSource.OnlinePull);
         }
 
         private async Task ResetSyncAfterPush(Task task, string key, T obj)
@@ -383,7 +383,7 @@
 
             if (this.streamingOptions == StreamingOptions.None)
             {
-                this.subject.OnNext(new FirebaseEvent<T>(key, obj, obj == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Online));
+                this.subject.OnNext(new FirebaseEvent<T>(key, obj, obj == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.OnlinePush));
             }
         }
 
