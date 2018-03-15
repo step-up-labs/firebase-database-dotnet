@@ -16,12 +16,10 @@ namespace Firebase.Database.Query
     /// <summary>
     /// Represents a firebase query. 
     /// </summary>
-    public abstract class FirebaseQuery : IFirebaseQuery, IDisposable
+    public abstract class FirebaseQuery : IFirebaseQuery
     {
         protected readonly FirebaseQuery Parent;
          
-        private HttpClient client;
-
         /// <summary> 
         /// Initializes a new instance of the <see cref="FirebaseQuery"/> class.
         /// </summary>
@@ -59,7 +57,7 @@ namespace Firebase.Database.Query
                 throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
             }
 
-            return await this.GetClient().GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
+            return await this.Client.HttpClient.GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
                 .ConfigureAwait(false);
         }
 
@@ -86,7 +84,7 @@ namespace Firebase.Database.Query
 
             try
             {
-                var response = await this.GetClient().GetAsync(url).ConfigureAwait(false);
+                var response = await this.Client.HttpClient.GetAsync(url).ConfigureAwait(false);
                 statusCode = response.StatusCode;
                 responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -151,7 +149,7 @@ namespace Firebase.Database.Query
             }
             else
             {
-                var c = this.GetClient();
+                var c = this.Client.HttpClient;
                 var sendData = await this.SendAsync(c, data, HttpMethod.Post).ConfigureAwait(false);
                 var result = JsonConvert.DeserializeObject<PostResult>(sendData, Client.Options.JsonSerializerSettings);
 
@@ -167,7 +165,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="Task"/>. </returns>
         public async Task PatchAsync(string data)
         {
-            var c = this.GetClient();
+            var c = this.Client.HttpClient;
 
             await this.Silent().SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
         }
@@ -180,7 +178,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="Task"/>. </returns>
         public async Task PutAsync(string data)
         {
-            var c = this.GetClient();
+            var c = this.Client.HttpClient;
 
             await this.Silent().SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
         }
@@ -191,7 +189,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="Task"/>. </returns>
         public async Task DeleteAsync()
         {
-            var c = this.GetClient();
+            var c = this.Client.HttpClient;
             var url = string.Empty;
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
@@ -220,14 +218,6 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Disposes this instance.  
-        /// </summary>
-        public void Dispose()
-        {
-            this.client?.Dispose();
-        }
-
-        /// <summary>
         /// Build the url segment of this child.
         /// </summary>
         /// <param name="child"> The child of this query. </param>
@@ -244,16 +234,6 @@ namespace Firebase.Database.Query
             }
 
             return url;
-        }
-
-        private HttpClient GetClient()
-        {
-            if (this.client == null)
-            {
-                this.client = new HttpClient();
-            }
-
-            return this.client;
         }
 
         private async Task<string> SendAsync(HttpClient client, string data, HttpMethod method)
