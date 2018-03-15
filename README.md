@@ -17,7 +17,7 @@ Install-Package FirebaseDatabase.net -pre
 ```
 
 ## Supported frameworks
-.NET Standard 1.1 - see https://github.com/dotnet/standard/blob/master/docs/versions.md for compatibility matrix
+.NET Standard 2.0 - see https://github.com/dotnet/standard/blob/master/docs/versions.md for compatibility matrix
 
 ## Usage
 

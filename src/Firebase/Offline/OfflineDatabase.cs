@@ -3,16 +3,17 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
-    using Lex.Db;
-    
+    using LiteDB;
+
     /// <summary>
     /// The offline database.
     /// </summary>
     public class OfflineDatabase : IDictionary<string, OfflineEntry>
     {
-        private readonly DbInstance db;
+        private readonly LiteRepository db;
         private readonly IDictionary<string, OfflineEntry> cache;
 
         /// <summary>
@@ -23,16 +24,21 @@
         public OfflineDatabase(Type itemType, string filenameModifier)
         {
             var fullName = this.GetFileName(itemType.FullName);
-            if (fullName.Length > 100)
+            if(fullName.Length > 100)
             {
                 fullName = fullName.Substring(0, 100);
             }
 
-            this.db = new DbInstance(fullName + filenameModifier);
-            this.db.Map<OfflineEntry>().Automap(o => o.Key);
-            this.db.Initialize();
+            BsonMapper mapper = BsonMapper.Global;
+            mapper.Entity<OfflineEntry>().Id(o => o.Key);
 
-            this.cache = this.db.LoadAll<OfflineEntry>().ToDictionary(o => o.Key, o => o);
+            string root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string filename = fullName + filenameModifier + ".db";
+            var path = Path.Combine(root, filename);
+            this.db = new LiteRepository(new LiteDatabase(path, mapper));
+
+            this.cache = db.Database.GetCollection<OfflineEntry>().FindAll()
+                .ToDictionary(o => o.Key, o => o);
         }
 
         /// <summary>
@@ -73,7 +79,7 @@
             set
             {
                 this.cache[key] = value;
-                this.db.Save(value);
+                this.db.Upsert(value);
             }
         }
 
@@ -106,7 +112,7 @@
         public void Clear()
         {
             this.cache.Clear();
-            this.db.Purge();
+            this.db.Delete<OfflineEntry>(Query.All());
         }
 
         /// <summary>
@@ -114,7 +120,7 @@
         /// </summary>
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param> 
         /// <returns> True if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. </returns>
-        public bool Contains(KeyValuePair<string, OfflineEntry> item) 
+        public bool Contains(KeyValuePair<string, OfflineEntry> item)
         {
             return this.ContainsKey(item.Key);
         }
@@ -134,7 +140,7 @@
         /// </summary>
         /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
         /// <returns> True if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>. </returns>
-        public bool Remove(KeyValuePair<string, OfflineEntry> item) 
+        public bool Remove(KeyValuePair<string, OfflineEntry> item)
         {
             return this.Remove(item.Key);
         }
@@ -157,7 +163,7 @@
         public void Add(string key, OfflineEntry value)
         {
             this.cache.Add(key, value);
-            this.db.Save(value);
+            this.db.Insert(value);
         }
 
         /// <summary>
@@ -165,10 +171,10 @@
         /// </summary>
         /// <param name="key">The key of the element to remove.</param>
         /// <returns> True if the element is successfully removed; otherwise, false.  This method also returns false if <paramref name="key"/> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"/>. </returns>
-        public bool Remove(string key) 
+        public bool Remove(string key)
         {
             this.cache.Remove(key);
-            return this.db.DeleteByKey<OfflineEntry>(key);
+            return this.db.Delete<OfflineEntry>(key);
         }
 
         /// <summary>
@@ -176,14 +182,14 @@
         /// </summary> 
         /// <param name="key">The key whose value to get.</param><param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, the default value for the type of the <paramref name="value"/> parameter. This parameter is passed uninitialized.</param>
         /// <returns> True if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key; otherwise, false. </returns>
-        public bool TryGetValue(string key, out OfflineEntry value) 
+        public bool TryGetValue(string key, out OfflineEntry value)
         {
             return this.cache.TryGetValue(key, out value);
         }
 
         private string GetFileName(string fileName)
         {
-            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            foreach(char c in System.IO.Path.GetInvalidFileNameChars())
             {
                 fileName = fileName.Replace(c, '_');
             }

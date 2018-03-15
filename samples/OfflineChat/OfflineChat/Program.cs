@@ -27,8 +27,8 @@
                 });
 
 
-            var messagesDb = client.Child("offlinemessages").AsRealtimeDatabase<Message>();
-            var authorsDb = client.Child("offlineauthors").AsRealtimeDatabase<Author>();
+            var messagesDb = client.Child("offlinemessages").AsRealtimeDatabase<Message>("", "", StreamingOptions.LatestOnly, InitialPullStrategy.MissingOnly, true);
+            var authorsDb = client.Child("offlineauthors").AsRealtimeDatabase<Author>("", "", StreamingOptions.LatestOnly, InitialPullStrategy.MissingOnly, true);
 
             // watch exceptions
             authorsDb.SyncExceptionThrown += (s, ex) => Console.WriteLine(ex.Exception);
