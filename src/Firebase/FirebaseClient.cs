@@ -1,3 +1,5 @@
+using System.Net.Http;
+
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Firebase.Database.Tests")]
 
 namespace Firebase.Database
@@ -12,8 +14,9 @@ namespace Firebase.Database
     /// <summary>
     /// Firebase client which acts as an entry point to the online database.
     /// </summary>
-    public class FirebaseClient
+    public class FirebaseClient : IDisposable
     {
+        internal readonly HttpClient HttpClient;
         internal readonly FirebaseOptions Options;
 
         private readonly string baseUrl;
@@ -25,6 +28,7 @@ namespace Firebase.Database
         /// <param name="offlineDatabaseFactory"> Offline database. </param>  
         public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
+            this.HttpClient = new HttpClient();
             this.Options = options ?? new FirebaseOptions();
 
             this.baseUrl = baseUrl;
@@ -43,6 +47,11 @@ namespace Firebase.Database
         public ChildQuery Child(string resourceName)
         {
             return new ChildQuery(this, () => this.baseUrl + resourceName);
+        }
+
+        public void Dispose()
+        {
+            HttpClient?.Dispose();
         }
     }
 }
