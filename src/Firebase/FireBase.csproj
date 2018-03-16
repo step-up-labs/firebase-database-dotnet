@@ -16,9 +16,9 @@
       Streaming changes (both online and offline) are done using Reactive Extensions.
     </Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageIconUrl>https://github.com/step-up-labs/firebase-authentication-dotnet/raw/master/art/FirebaseLogo.128x128.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/step-up-labs/firebase-authentication-dotnet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/step-up-labs/firebase-authentication-dotnet/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/step-up-labs/firebase-database-dotnet/raw/master/art/FirebaseLogo.128x128.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/step-up-labs/firebase-database-dotnet</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/step-up-labs/firebase-database-dotnet/blob/master/LICENSE</PackageLicenseUrl>
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
     <Copyright>Step Up Labs, Inc. 2017</Copyright>
