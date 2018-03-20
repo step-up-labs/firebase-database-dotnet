@@ -23,7 +23,7 @@
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
         public OfflineDatabase(Type itemType, string filenameModifier)
         {
-            var fullName = this.GetFileName(itemType.FullName);
+            var fullName = this.GetFileName(itemType.ToString());
             if(fullName.Length > 100)
             {
                 fullName = fullName.Substring(0, 100);
@@ -189,7 +189,8 @@
 
         private string GetFileName(string fileName)
         {
-            foreach(char c in System.IO.Path.GetInvalidFileNameChars())
+            var invalidChars = new[] { '`', '[', ',', '=' };
+            foreach(char c in invalidChars.Concat(System.IO.Path.GetInvalidFileNameChars()).Distinct())
             {
                 fileName = fileName.Replace(c, '_');
             }
