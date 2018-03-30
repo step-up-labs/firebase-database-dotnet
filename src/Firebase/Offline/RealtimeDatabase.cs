@@ -113,7 +113,7 @@
                 }
             }
 
-            var setObject = this.firebaseCache.PushData((fullKey.Item3 ? "" : "/") + fullKey.Item1, serializedObject, false).First();
+            var setObject = this.firebaseCache.PushData("/" + fullKey.Item1, serializedObject, string.IsNullOrEmpty(this.elementRoot)).First();
 
             if (!this.Database.ContainsKey(key) || this.Database[key].SyncOptions != SyncOptions.Patch && this.Database[key].SyncOptions != SyncOptions.Put)
             {
