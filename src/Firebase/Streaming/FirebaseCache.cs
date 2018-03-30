@@ -43,13 +43,13 @@ namespace Firebase.Database.Streaming
         /// <param name="path"> The path of incoming data, separated by slash. </param>  
         /// <param name="data"> The data in json format as returned by firebase. </param>  
         /// <returns> Collection of top-level entities which were affected by the push. </returns>
-        public IEnumerable<FirebaseObject<T>> PushData(string path, string data)
+        public IEnumerable<FirebaseObject<T>> PushData(string path, string data, bool removeEmptyEntries = true)
         {
             object obj = this.dictionary;
             Action<object> primitiveObjSetter = null;
             Action objDeleter = null;
 
-            var pathElements = path.Split(new[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+            var pathElements = path.Split(new[] { "/" }, removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
 
             // first find where we should insert the data to
             foreach (var element in pathElements)
