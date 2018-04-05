@@ -358,7 +358,7 @@
 
             foreach (var group in taskGroups)
             {
-                var tasks = group.Select(pair => this.ResetAfterPull(this.childQuery.Child(pair.Key).OnceSingleAsync<T>(), pair.Key, pair.Value));
+                var tasks = group.Select(pair => this.ResetAfterPull(this.childQuery.Child(pair.Key == this.elementRoot ? string.Empty : pair.Key).OnceSingleAsync<T>(), pair.Key, pair.Value));
 
                 try
                 { 
