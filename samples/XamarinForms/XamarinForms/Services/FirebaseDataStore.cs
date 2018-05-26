@@ -13,7 +13,7 @@ namespace XamarinForms.Services
     public class FirebaseDataStore<T> : IDataStore<T>
         where T : class
     {
-        private const string BaseUrl = "https://database-test-db252.firebaseio.com";
+        private const string BaseUrl = "https://<YOUR PROJECT ID>.firebaseio.com";
 
         private readonly ChildQuery _query;
 
