@@ -12,7 +12,7 @@ namespace XamarinForms.Services
     public class FirebaseOfflineDataStore<T> : IDataStore<T>
         where T : class
     {
-        private const string BaseUrl = "https://database-test-db252.firebaseio.com";
+        private const string BaseUrl = "https://<YOUR PROJECT ID>.firebaseio.com";
 
         private readonly RealtimeDatabase<T> _realtimeDb;
 
