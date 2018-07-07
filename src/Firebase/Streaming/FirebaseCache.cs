@@ -18,6 +18,10 @@ namespace Firebase.Database.Streaming
     {
         private readonly IDictionary<string, T> dictionary;
         private readonly bool isDictionaryType;
+        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings()
+        {
+            ObjectCreationHandling = ObjectCreationHandling.Replace
+        };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseCache{T}"/> class.
@@ -146,7 +150,7 @@ namespace Firebase.Database.Streaming
                 }
                 else
                 {
-                    JsonConvert.PopulateObject(data, obj);
+                    JsonConvert.PopulateObject(data, obj, this.serializerSettings);
                 }
 
                 this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
