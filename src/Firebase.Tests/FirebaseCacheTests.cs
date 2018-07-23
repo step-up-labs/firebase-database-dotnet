@@ -382,5 +382,35 @@
 
             entities.ShouldAllBeEquivalentTo(expectation);
         }
+
+        [TestMethod]
+        public void ExistingKeyShouldReplace()
+        {
+            var cache = new FirebaseCache<HNChanges>();
+            var original = @"
+                {
+                    ""items"": [1, 2, 3],
+                    ""profiles"": [""a"", ""b"", ""c""]
+                }";
+            var incoming = @"
+                {
+                    ""items"": [4, 5, 6],
+                    ""profiles"": [""d"", ""e"", ""f""]
+                }";
+            var expectation = new []
+            {
+                new FirebaseObject<HNChanges>("updates", new HNChanges()
+                    {
+                        items = new List<long>() { 4, 5, 6 },
+                        profiles = new List<string>() { "d", "e", "f" }
+                    }
+                )
+            };
+
+            cache.PushData("updates/", original).ToList();
+            var entities = cache.PushData("updates/", incoming).ToList();
+
+            entities.ShouldAllBeEquivalentTo(expectation);
+        }
     }
 }

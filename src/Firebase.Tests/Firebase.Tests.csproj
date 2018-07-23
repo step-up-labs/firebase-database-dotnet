@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Entities\Dinosaur.cs" />
     <Compile Include="Entities\Dimensions.cs" />
+    <Compile Include="Entities\HNChanges.cs" />
     <Compile Include="Entities\JurassicWorld.cs" />
     <Compile Include="FirebaseCacheTests.cs" />
     <Compile Include="FirebasePathTests.cs" />
