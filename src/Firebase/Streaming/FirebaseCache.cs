@@ -158,6 +158,11 @@ namespace Firebase.Database.Streaming
             }
         }
 
+        public bool Contains(string key)
+        {
+            return this.dictionary.Keys.Contains(key);
+        }
+
         private object CreateInstance(Type type)
         {
             if (type == typeof(string))
