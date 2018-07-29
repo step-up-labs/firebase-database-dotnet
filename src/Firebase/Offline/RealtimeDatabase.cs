@@ -270,14 +270,18 @@
             {
                 case StreamingOptions.LatestOnly:
                     // stream since the latest key
-                    var queryLatest = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
+                    // If elementRoot is provided, create a child query so we can observe that single element instead of the whole collection.
+                    var queryLatest = string.IsNullOrWhiteSpace(this.elementRoot) ?
+                        (IFirebaseQuery)this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey()) :
+                        this.childQuery.Child(this.elementRoot);
                     this.firebaseSubscription = new FirebaseSubscription<T>(observer, queryLatest, this.elementRoot, this.firebaseCache);
                     this.firebaseSubscription.ExceptionThrown += this.StreamingExceptionThrown;
 
                     return new CompositeDisposable(this.firebaseSubscription.Run(), completeDisposable);
                 case StreamingOptions.Everything:
                     // stream everything
-                    var queryAll = this.childQuery;
+                    // If elementRoot is provided, create a child query so we can observe that single element instead of the whole collection.
+                    var queryAll = this.childQuery.Child(this.elementRoot);
                     this.firebaseSubscription = new FirebaseSubscription<T>(observer, queryAll, this.elementRoot, this.firebaseCache);
                     this.firebaseSubscription.ExceptionThrown += this.StreamingExceptionThrown;
 

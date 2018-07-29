@@ -115,7 +115,9 @@ namespace Firebase.Database.Query
         {
             return Observable.Create<FirebaseEvent<T>>(observer =>
             {
-                var sub = new FirebaseSubscription<T>(observer, this, elementRoot, new FirebaseCache<T>());
+                // If elementRoot is provided, create a child query so we can observe that single element instead of the whole collection.
+                var query = string.IsNullOrWhiteSpace(elementRoot) ? this : new ChildQuery(this, () => elementRoot, this.Client);
+                var sub = new FirebaseSubscription<T>(observer, query, elementRoot, new FirebaseCache<T>());
                 sub.ExceptionThrown += exceptionHandler;
                 return sub.Run();
             });
