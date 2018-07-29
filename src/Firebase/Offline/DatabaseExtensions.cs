@@ -15,42 +15,6 @@
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
         /// <param name="elementRoot"> Optional custom root element of received json items. </param>
-        /// <param name="streamChanges"> Specifies whether changes should be streamed from the server. </param> 
-        /// <param name="initialPullStrategy"> Specifies what strategy should be used for initial pulling of server data. </param>
-        /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
-        /// <returns> The <see cref="RealtimeDatabase{T}"/>. </returns>
-        [Obsolete("Use one of the other overloads which lets you specify how you want the realtime streaming to be run.")]
-        public static RealtimeDatabase<T> AsRealtimeDatabase<T>(this ChildQuery query, string filenameModifier = "", string elementRoot = "", bool streamChanges = true, InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true) 
-            where T: class
-        {
-            return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory, filenameModifier, streamChanges ? StreamingOptions.LatestOnly : StreamingOptions.None, initialPullStrategy, pushChanges);
-        }
-
-        /// <summary>
-        /// Create new instances of the <see cref="RealtimeDatabase{T}"/>.
-        /// </summary>
-        /// <typeparam name="T"> Type of elements. </typeparam>
-        /// <typeparam name="TSetHandler"> Type of the custom <see cref="ISetHandler{T}"/> to use. </typeparam>
-        /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
-        /// <param name="elementRoot"> Optional custom root element of received json items. </param>
-        /// <param name="streamChanges"> Specifies whether changes should be streamed from the server. </param> 
-        /// <param name="initialPullStrategy"> Specifies what strategy should be used for initial pulling of server data. </param>
-        /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
-        /// <returns> The <see cref="RealtimeDatabase{T}"/>. </returns>
-        [Obsolete("Use one of the other overloads which lets you specify how you want the realtime streaming to be run.")]
-        public static RealtimeDatabase<T> AsRealtimeDatabase<T, TSetHandler>(this ChildQuery query, string filenameModifier = "", string elementRoot = "", bool streamChanges = true, InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true)
-            where T : class
-            where TSetHandler: ISetHandler<T>, new()
-        {
-            return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory, filenameModifier, streamChanges ? StreamingOptions.LatestOnly : StreamingOptions.None, initialPullStrategy, pushChanges, Activator.CreateInstance<TSetHandler>());
-        }
-
-        /// <summary>
-        /// Create new instances of the <see cref="RealtimeDatabase{T}"/>.
-        /// </summary>
-        /// <typeparam name="T"> Type of elements. </typeparam>
-        /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
-        /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <param name="streamingOptions"> Realtime streaming options. </param> 
         /// <param name="initialPullStrategy"> Specifies what strategy should be used for initial pulling of server data. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
