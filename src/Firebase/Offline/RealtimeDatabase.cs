@@ -196,7 +196,7 @@
                 var initialData = Observable.Empty<FirebaseEvent<T>>();
                 if(this.Database.TryGetValue(this.elementRoot, out OfflineEntry oe))
                 {
-                    initialData = Observable.Return(offlineEntry)
+                    initialData = Observable.Return(oe)
                         .Where(offlineEntry => !string.IsNullOrEmpty(offlineEntry.Data) && offlineEntry.Data != "null" && !offlineEntry.IsPartial)
                         .Select(offlineEntry => new FirebaseEvent<T>(offlineEntry.Key, offlineEntry.Deserialize<T>(), FirebaseEventType.InsertOrUpdate, FirebaseEventSource.Offline));
                 }
