@@ -184,10 +184,14 @@ namespace Firebase.Database.Streaming
                     var path = result["path"].ToString();
                     var data = result["data"].ToString();
 
-                    if (path == "/" && data == string.Empty)
+                    // If an elementRoot parameter is provided, but it's not in the cache, it was already deleted. So we can return an empty object.
+                    if(string.IsNullOrWhiteSpace(this.elementRoot) || !this.cache.Contains(this.elementRoot))
                     {
-                        this.observer.OnNext(FirebaseEvent<T>.Empty(FirebaseEventSource.OnlineStream));
-                        return;
+                        if(path == "/" && data == string.Empty)
+                        {
+                            this.observer.OnNext(FirebaseEvent<T>.Empty(FirebaseEventSource.OnlineStream));
+                            return;
+                        }
                     }
 
                     var eventType = string.IsNullOrWhiteSpace(data) ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate;
