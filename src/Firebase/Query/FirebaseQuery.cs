@@ -151,9 +151,7 @@ namespace Firebase.Database.Query
             if (generateKeyOffline)
             {
                 var key = FirebaseKeyGenerator.Next();
-                await new ChildQuery(this, () => key, this.Client).PutAsync(data).ConfigureAwait(false);
-
-                return new FirebaseObject<string>(key, data);
+                return await PostAsync(data, key, timeout).ConfigureAwait(false);
             }
             else
             {
@@ -163,6 +161,19 @@ namespace Firebase.Database.Query
 
                 return new FirebaseObject<string>(result.Name, data);
             }
+        }
+
+        /// <summary>
+        /// Posts given object to repository.
+        /// </summary>
+        /// <param name="data"> Data to send. </param>
+        /// <param name="key"> Key to be used with this object. </param>
+        /// <param name="timeout"> Optional timeout value. </param>
+        /// <returns> Resulting firebase object with populated key. </returns>
+        public async Task<FirebaseObject<string>> PostAsync(string data, string key, TimeSpan? timeout = null)
+        {
+            await new ChildQuery(this, () => key, Client).PutAsync(data, timeout).ConfigureAwait(false);
+            return new FirebaseObject<string>(key, data);
         }
 
         /// <summary>
