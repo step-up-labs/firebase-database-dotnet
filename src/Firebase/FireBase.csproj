@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>FirebaseDatabase.net</PackageId>
-    <PackageVersion>4.0.0-alpha8</PackageVersion>
+    <PackageVersion>4.0.0-beta1</PackageVersion>
     <Authors>Step Up Labs, Inc.</Authors>
     <Description>Complex C# library for Firebase Realtime Database built on top of Firebase REST API. Among others it supports following:
 
@@ -31,9 +31,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteDB" Version="4.1.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="System.Reactive" Version="3.1.1" />
+    <PackageReference Include="LiteDB" Version="4.1.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="System.Reactive" Version="4.1.0" />
   </ItemGroup>
 
 </Project>

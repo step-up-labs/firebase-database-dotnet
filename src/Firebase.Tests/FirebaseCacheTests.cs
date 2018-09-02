@@ -43,7 +43,7 @@
                 new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(3, 3, 3))
             };
 
-            entities.ShouldAllBeEquivalentTo(expectation);
+            entities.Should().BeEquivalentTo(expectation);
         }
 
         [TestMethod]
@@ -69,7 +69,7 @@
             var trex = new FirebaseObject<Dinosaur>("trex", new Dinosaur(4, 4, 4));
 
             entities.Should().HaveCount(1);
-            entities.First().ShouldBeEquivalentTo(trex);
+            entities.First().Should().BeEquivalentTo(trex);
         }
 
         [TestMethod]
@@ -95,7 +95,7 @@
             var stegosaurus = new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(4, 4, 4));
 
             entities.Should().HaveCount(1);
-            entities.First().ShouldBeEquivalentTo(stegosaurus);
+            entities.First().Should().BeEquivalentTo(stegosaurus);
         }
 
         [TestMethod]
@@ -116,7 +116,7 @@
             var stegosaurus = new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(4, 3, 3));
 
             entities.Should().HaveCount(1);
-            entities.First().ShouldBeEquivalentTo(stegosaurus);
+            entities.First().Should().BeEquivalentTo(stegosaurus);
         }
 
         [TestMethod]
@@ -151,7 +151,7 @@
             var entities = cache.PushData("/", jurassicPragueJson).ToList();
 
             entities.Should().HaveCount(1);
-            entities.First().ShouldBeEquivalentTo(jurassicPrague);
+            entities.First().Should().BeEquivalentTo(jurassicPrague);
         }
 
         [TestMethod]
@@ -174,8 +174,8 @@
             var entities = cache.PushData("/jurassicPrague/dinosaurs/stegosaurus/ds", stegosaurusds).ToList();
 
             entities.Should().HaveCount(1);
-            entities.First().ShouldBeEquivalentTo(jurassicPrague);
-            jurassicPrague.Object.Dinosaurs["stegosaurus"].Dimensions.ShouldBeEquivalentTo(new Dimensions { Height = 4, Length = 4, Weight = 4 });
+            entities.First().Should().BeEquivalentTo(jurassicPrague);
+            jurassicPrague.Object.Dinosaurs["stegosaurus"].Dimensions.Should().BeEquivalentTo(new Dimensions { Height = 4, Length = 4, Weight = 4 });
 
             //var entities = cache.PushData("/jurassicPrague/dinosaurs/stegosaurus/Name", "").ToList();
         }
@@ -204,8 +204,8 @@
             var entities = cache.PushData("/jurassicPrague/dinosaurs/", trex).ToList();
 
             entities.Should().HaveCount(1);
-            entities.First().ShouldBeEquivalentTo(jurassicPrague);
-            jurassicPrague.Object.Dinosaurs["trex"].Dimensions.ShouldBeEquivalentTo(new Dimensions { Height = 5, Length = 4, Weight = 4 });
+            entities.First().Should().BeEquivalentTo(jurassicPrague);
+            jurassicPrague.Object.Dinosaurs["trex"].Dimensions.Should().BeEquivalentTo(new Dimensions { Height = 5, Length = 4, Weight = 4 });
         }
 
         [TestMethod]
@@ -221,13 +221,13 @@
 }";
 
             var entities = cache.PushData("/", bools).ToList();
-            entities.ShouldBeEquivalentTo(boolDictionary);
+            entities.Should().BeEquivalentTo(boolDictionary);
 
             entities = cache.PushData("/d", "true").ToList();
-            entities.First().ShouldBeEquivalentTo(new FirebaseObject<bool>("d", true));
+            entities.First().Should().BeEquivalentTo(new FirebaseObject<bool>("d", true));
 
             entities = cache.PushData("/c", "true").ToList();
-            entities.First().ShouldBeEquivalentTo(new FirebaseObject<bool>("c", true));
+            entities.First().Should().BeEquivalentTo(new FirebaseObject<bool>("c", true));
         }
 
         [TestMethod]
@@ -243,14 +243,14 @@
 }";
 
             var entities = cache.PushData("/", strings).ToList();
-            entities.ShouldBeEquivalentTo(stringDictionary);
+            entities.Should().BeEquivalentTo(stringDictionary);
 
             // firebase sends strings without double quotes
             entities = cache.PushData("/d", @"d").ToList();
-            entities.First().ShouldBeEquivalentTo(new FirebaseObject<string>("d", "d"));
+            entities.First().Should().BeEquivalentTo(new FirebaseObject<string>("d", "d"));
 
             entities = cache.PushData("/c", @"cc").ToList();
-            entities.First().ShouldBeEquivalentTo(new FirebaseObject<string>("c", "cc"));
+            entities.First().Should().BeEquivalentTo(new FirebaseObject<string>("c", "cc"));
         }
 
         [TestMethod]
@@ -279,14 +279,14 @@
             // delete top level item from dictionary
             entities = cache.PushData("/stegosaurus", " ").ToList();
 
-            cache.Count().ShouldBeEquivalentTo(1);
-            entities.ShouldAllBeEquivalentTo(new[] { new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(3, 3, 3)) });
+            cache.Count().Should().Be(1);
+            entities.Should().BeEquivalentTo(new[] { new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(3, 3, 3)) });
 
             // delete a property - it should be set to null
             entities = cache.PushData("/lambeosaurus/ds", " ").ToList();
 
-            cache.Count().ShouldBeEquivalentTo(1);
-            entities.ShouldAllBeEquivalentTo(new[] { new FirebaseObject<Dinosaur>("lambeosaurus", new Dinosaur { Dimensions = null }) });
+            cache.Count().Should().Be(1);
+            entities.Should().BeEquivalentTo(new[] { new FirebaseObject<Dinosaur>("lambeosaurus", new Dinosaur { Dimensions = null }) });
         }
 
         [TestMethod]
@@ -321,7 +321,7 @@
             // delete top level item from dictionary
             entities = cache.PushData("/stegosaurus/ds", patch).ToList();
 
-            entities.First().ShouldBeEquivalentTo(new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(8, 3, 3)));
+            entities.First().Should().BeEquivalentTo(new FirebaseObject<Dinosaur>("stegosaurus", new Dinosaur(8, 3, 3)));
         }
 
         [TestMethod]
@@ -339,7 +339,7 @@
             cache.PushData("root/", data).ToList();
             var entities = cache.PushData("root/a", updateData).ToList();
 
-            entities.First().ShouldBeEquivalentTo(new FirebaseObject<Dictionary<string, string>>("root",  new Dictionary<string, string>()
+            entities.First().Should().BeEquivalentTo(new FirebaseObject<Dictionary<string, string>>("root",  new Dictionary<string, string>()
             {
                 ["a"] = "aaa",
                 ["b"] = "bb",
@@ -380,7 +380,7 @@
                 new FirebaseObject<Dinosaur>("1", new Dinosaur(3, 3, 3))
             };
 
-            entities.ShouldAllBeEquivalentTo(expectation);
+            entities.Should().BeEquivalentTo(expectation);
         }
 
         [TestMethod]
@@ -410,7 +410,7 @@
             cache.PushData("updates/", original).ToList();
             var entities = cache.PushData("updates/", incoming).ToList();
 
-            entities.ShouldAllBeEquivalentTo(expectation);
+            entities.Should().BeEquivalentTo(expectation);
         }
     }
 }
