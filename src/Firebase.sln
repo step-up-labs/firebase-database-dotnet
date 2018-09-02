@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firebase.Tests", "FireBase.Tests\Firebase.Tests.csproj", "{9EC0947B-8F1F-40DD-80FF-43FC2DD77BFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firebase.Tests", "Firebase.Tests\Firebase.Tests.csproj", "{9EC0947B-8F1F-40DD-80FF-43FC2DD77BFD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Firebase", "Firebase\Firebase.csproj", "{FF9D620C-0241-4AD3-B3AB-200F11CAD936}"
 EndProject
