@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -176,6 +178,30 @@ namespace Firebase.Database.Query
             var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings), generateKeyOffline);
 
             return new FirebaseObject<T>(result.Key, obj);
+        }
+
+        /// <summary>
+        /// Fan out given item to multiple locations at once. See https://firebase.googleblog.com/2015/10/client-side-fan-out-for-data-consistency_73.html for details.
+        /// </summary>
+        /// <typeparam name="T"> Type of object to fan out. </typeparam>
+        /// <param name="query"> Current node. </param>
+        /// <param name="item"> Object to fan out. </param>
+        /// <param name="relativePaths"> Locations where to store the item. </param>
+        public static async Task FanOut<T>(this ChildQuery child, T item, params string[] relativePaths)
+        {
+            if (relativePaths == null)
+            {
+                throw new ArgumentNullException(nameof(relativePaths));
+            }
+
+            var fanoutObject = new Dictionary<string, T>(relativePaths.Length);
+
+            foreach (var path in relativePaths)
+            {
+                fanoutObject.Add(path, item);
+            }
+
+            await child.PatchAsync(fanoutObject);
         }
     }
 }
