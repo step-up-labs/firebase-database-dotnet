@@ -152,6 +152,7 @@
                 .RetryAfterDelay<IReadOnlyCollection<FirebaseObject<T>>, FirebaseException>(
                     this.childQuery.Client.Options.SyncPeriod,
                     ex => ex.StatusCode == System.Net.HttpStatusCode.OK) // OK implies the request couldn't complete due to network error. 
+                .Select(e => this.ResetDatabaseFromInitial(e, false))
                 .SelectMany(e => e)
                 .Do(e => 
                 {
@@ -215,9 +216,10 @@
                             .RetryAfterDelay<IReadOnlyCollection<FirebaseObject<T>>, FirebaseException>(
                                 this.childQuery.Client.Options.SyncPeriod, 
                                 ex => ex.StatusCode == System.Net.HttpStatusCode.OK) // OK implies the request couldn't complete due to network error. 
+                            .Select(e => this.ResetDatabaseFromInitial(e))
                             .SelectMany(e => e)
                             .Do(this.SetObjectFromInitialPull)
-                            .Select(e => new FirebaseEvent<T>(e.Key, e.Object, FirebaseEventType.InsertOrUpdate, FirebaseEventSource.OnlineInitial))
+                            .Select(e => new FirebaseEvent<T>(e.Key, e.Object, e.Object == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.OnlineInitial))
                             .Concat(Observable.Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))))
                             .Do(next => { }, e => this.observable = null, () => this.observable = null)
                     .Replay()
@@ -231,6 +233,22 @@
         {
             this.subject.OnCompleted();
             this.firebaseSubscription?.Dispose();
+        }
+
+        private IReadOnlyCollection<FirebaseObject<T>> ResetDatabaseFromInitial(IReadOnlyCollection<FirebaseObject<T>> collection, bool onlyWhenInitialEverything = true)
+        {
+            if (onlyWhenInitialEverything && this.initialPullStrategy != InitialPullStrategy.Everything)
+            {
+                return collection;
+            }
+
+            // items which are in local db, but not in the online collection
+            var extra = this.Once()
+                            .Select(f => f.Key)
+                            .Except(collection.Select(c => c.Key))
+                            .Select(k => new FirebaseObject<T>(k, null));
+
+            return collection.Concat(extra).ToList();
         }
 
         private void SetObjectFromInitialPull(FirebaseObject<T> e)
