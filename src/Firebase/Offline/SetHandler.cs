@@ -6,15 +6,18 @@
 
     public class SetHandler<T> : ISetHandler<T>
     {
-        public virtual Task SetAsync(ChildQuery query, string key, OfflineEntry entry)
+        public virtual async Task SetAsync(ChildQuery query, string key, OfflineEntry entry)
         {
-            if (entry.SyncOptions == SyncOptions.Put)
+            using (var child = query.Child(key))
             {
-                return query.Child(key).PutAsync(entry.Data);
-            }
-            else
-            {
-                return query.Child(key).PatchAsync(entry.Data);
+                if (entry.SyncOptions == SyncOptions.Put)
+                {
+                    await child.PutAsync(entry.Data);
+                }
+                else
+                {
+                    await child.PatchAsync(entry.Data);
+                }
             }
         }
     }
