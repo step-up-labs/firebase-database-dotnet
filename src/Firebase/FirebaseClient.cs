@@ -28,8 +28,8 @@ namespace Firebase.Database
         /// <param name="offlineDatabaseFactory"> Offline database. </param>  
         public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
-            this.HttpClient = new HttpClient();
             this.Options = options ?? new FirebaseOptions();
+            this.HttpClient = Options.HttpClientFactory.GetHttpClient();
 
             this.baseUrl = baseUrl;
 

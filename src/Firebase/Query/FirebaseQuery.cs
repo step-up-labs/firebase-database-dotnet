@@ -259,7 +259,7 @@ namespace Firebase.Database.Query
         {
             if (this.client == null)
             {
-                this.client = new HttpClient();
+                this.client = Client.Options.HttpClientFactory.GetHttpClient();
             }
 
             if (!timeout.HasValue)
