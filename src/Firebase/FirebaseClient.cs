@@ -29,7 +29,7 @@ namespace Firebase.Database
         public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
             this.Options = options ?? new FirebaseOptions();
-            this.HttpClient = Options.HttpClientFactory.GetHttpClient();
+            this.HttpClient = Options.HttpClientFactory.GetHttpClient(null);
 
             this.baseUrl = baseUrl;
 

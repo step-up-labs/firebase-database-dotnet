@@ -5,6 +5,6 @@ namespace Firebase
 {
     public interface IHttpClientFactory
     {
-        HttpClient GetHttpClient();
+        HttpClient GetHttpClient(TimeSpan? timeout);
     }
 }
