@@ -260,15 +260,15 @@ namespace Firebase.Database.Query
             if (this.client == null)
             {
                 this.client = new HttpClient();
-            }
 
-            if (!timeout.HasValue)
-            {
-                this.client.Timeout = DEFAULT_HTTP_CLIENT_TIMEOUT;
-            }
-            else
-            {
-                this.client.Timeout = timeout.Value;
+                if (!timeout.HasValue)
+                {
+                    this.client.Timeout = DEFAULT_HTTP_CLIENT_TIMEOUT;
+                }
+                else
+                {
+                    this.client.Timeout = timeout.Value;
+                }
             }
 
             return this.client;
