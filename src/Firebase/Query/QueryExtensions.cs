@@ -119,7 +119,40 @@ namespace Firebase.Database.Query
         {
             return child.EqualTo(() => value);
         }
-        
+
+        /// <summary>
+        /// Instructs firebase to send data greater or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// </summary>
+        /// <param name="child"> Current node. </param>
+        /// <param name="value"> Value to start at. </param>
+        /// <returns> The <see cref="FilterQuery"/>. </returns>
+        public static FilterQuery StartAt(this ParameterQuery child, long value)
+        {
+            return child.StartAt(() => value);
+        }
+
+        /// <summary>
+        /// Instructs firebase to send data lower or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// </summary>
+        /// <param name="child"> Current node. </param>
+        /// <param name="value"> Value to start at. </param>
+        /// <returns> The <see cref="FilterQuery"/>. </returns>
+        public static FilterQuery EndAt(this ParameterQuery child, long value)
+        {
+            return child.EndAt(() => value);
+        }
+
+        /// <summary>
+        /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// </summary>
+        /// <param name="child"> Current node. </param>
+        /// <param name="value"> Value to start at. </param>
+        /// <returns> The <see cref="FilterQuery"/>. </returns>
+        public static FilterQuery EqualTo(this ParameterQuery child, long value)
+        {
+            return child.EqualTo(() => value);
+        }
+
         /// <summary>
         /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
