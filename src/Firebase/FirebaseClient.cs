@@ -16,7 +16,7 @@ namespace Firebase.Database
     /// </summary>
     public class FirebaseClient : IDisposable
     {
-        internal readonly HttpClient HttpClient;
+        internal readonly IHttpClientProxy HttpClient;
         internal readonly FirebaseOptions Options;
 
         private readonly string baseUrl;
