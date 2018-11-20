@@ -17,6 +17,7 @@
             this.SubscriptionStreamReaderFactory = s => new StreamReader(s);
             this.JsonSerializerSettings = new JsonSerializerSettings();
             this.SyncPeriod = TimeSpan.FromSeconds(10);
+            this.HttpClientFactory = new TransientHttpClientFactory();
         }
 
         /// <summary>
@@ -69,6 +70,14 @@
         /// </summary>
         public bool AsAccessToken
         {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Specify HttpClient factory to manage <see cref="System.Net.Http.HttpClient" /> lifecycle.
+        /// </summary>
+        public IHttpClientFactory HttpClientFactory {
             get;
             set;
         }

@@ -22,7 +22,7 @@ namespace Firebase.Database.Query
 
         protected readonly FirebaseQuery Parent;
 
-        protected HttpClient client;
+        private IHttpClientProxy client;
 
         /// <summary> 
         /// Initializes a new instance of the <see cref="FirebaseQuery"/> class.
@@ -259,19 +259,10 @@ namespace Firebase.Database.Query
         {
             if (this.client == null)
             {
-                this.client = new HttpClient();
+                this.client = Client.Options.HttpClientFactory.GetHttpClient(timeout ?? DEFAULT_HTTP_CLIENT_TIMEOUT);
             }
 
-            if (!timeout.HasValue)
-            {
-                this.client.Timeout = DEFAULT_HTTP_CLIENT_TIMEOUT;
-            }
-            else
-            {
-                this.client.Timeout = timeout.Value;
-            }
-
-            return this.client;
+            return this.client.GetHttpClient();
         }
 
         private async Task<string> SendAsync(HttpClient client, string data, HttpMethod method)

@@ -16,7 +16,7 @@ namespace Firebase.Database
     /// </summary>
     public class FirebaseClient : IDisposable
     {
-        internal readonly HttpClient HttpClient;
+        internal readonly IHttpClientProxy HttpClient;
         internal readonly FirebaseOptions Options;
 
         private readonly string baseUrl;
@@ -28,8 +28,8 @@ namespace Firebase.Database
         /// <param name="offlineDatabaseFactory"> Offline database. </param>  
         public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
-            this.HttpClient = new HttpClient();
             this.Options = options ?? new FirebaseOptions();
+            this.HttpClient = Options.HttpClientFactory.GetHttpClient(null);
 
             this.baseUrl = baseUrl;
 
