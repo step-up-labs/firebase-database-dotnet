@@ -22,7 +22,7 @@ namespace Firebase.Database.Query
 
         protected readonly FirebaseQuery Parent;
 
-        private HttpClient client;
+        protected HttpClient client;
 
         /// <summary> 
         /// Initializes a new instance of the <see cref="FirebaseQuery"/> class.
