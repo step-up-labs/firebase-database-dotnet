@@ -131,6 +131,9 @@ namespace Firebase.Database.Streaming
                 // nested dictionary changed
                 if (pathElements.Any())
                 {
+                    // Triggers an upsert if dictionary is an OfflineDatabase.
+                    this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
+
                     yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
                 }
             }
@@ -151,6 +154,9 @@ namespace Firebase.Database.Streaming
                 {
                     JsonConvert.PopulateObject(data, obj, this.serializerSettings);
                 }
+
+                // Triggers an upsert if dictionary is an OfflineDatabase.
+                this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
 
                 yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
             }
