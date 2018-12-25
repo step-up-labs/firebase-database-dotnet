@@ -131,7 +131,9 @@ namespace Firebase.Database.Streaming
                 // nested dictionary changed
                 if (pathElements.Any())
                 {
+                    // Triggers an upsert if dictionary is an OfflineDatabase.
                     this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
+
                     yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
                 }
             }
@@ -143,7 +145,7 @@ namespace Firebase.Database.Streaming
                 // firebase sends strings without double quotes
                 var targetObject = valueType == typeof(string) ? data.ToString() : JsonConvert.DeserializeObject(data, valueType);
 
-                if ((valueType.GetTypeInfo().IsPrimitive || valueType == typeof(string)) && primitiveObjSetter != null)
+                if ((valueType.GetTypeInfo().IsPrimitive || valueType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(valueType)) && primitiveObjSetter != null)
                 {
                     // handle primitive (value) types separately
                     primitiveObjSetter(targetObject);
@@ -153,7 +155,9 @@ namespace Firebase.Database.Streaming
                     JsonConvert.PopulateObject(data, obj, this.serializerSettings);
                 }
 
+                // Triggers an upsert if dictionary is an OfflineDatabase.
                 this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
+
                 yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
             }
         }
