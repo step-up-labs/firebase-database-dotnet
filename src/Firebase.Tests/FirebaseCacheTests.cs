@@ -412,5 +412,22 @@
 
             entities.Should().BeEquivalentTo(expectation);
         }
+
+        [TestMethod]
+        public void AddedItemShouldBeAppendedToCollection()
+        {
+            var cache = new FirebaseCache<List<long>>();
+            var original = @"[1, 2, 3]";
+            var incoming = @"[1, 2, 3, 4]";
+            var expectation = new []
+            {
+                new FirebaseObject<List<long>>("updates", new List<long>() { 1, 2, 3, 4 })
+            };
+
+            cache.PushData("updates/", original);
+            var entities = cache.PushData("updates/", incoming);
+
+            entities.Should().BeEquivalentTo(expectation);
+        }
     }
 }
