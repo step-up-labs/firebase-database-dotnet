@@ -25,4 +25,21 @@
         {
         }
     }
+
+    public class ContinueExceptionEventArgs<T> : ExceptionEventArgs<T> where T: Exception
+    {
+        public ContinueExceptionEventArgs(T exception, bool ignoreAndContinue) : base(exception)
+        {
+            this.IgnoreAndContinue = ignoreAndContinue;
+        }
+
+        /// <summary>
+        ///  Specifies whether operation in progress should ignore the exception and just continue.
+        /// </summary>
+        public bool IgnoreAndContinue
+        {
+            get;
+            set;
+        }
+    }
 }

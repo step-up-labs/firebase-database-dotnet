@@ -60,7 +60,7 @@ namespace Firebase.Database.Streaming
             this.client = query.Client;
         }
 
-        public event EventHandler<ExceptionEventArgs<FirebaseException>> ExceptionThrown;
+        public event EventHandler<ContinueExceptionEventArgs<FirebaseException>> ExceptionThrown;
 
         public void Dispose()
         {
@@ -135,19 +135,28 @@ namespace Firebase.Database.Streaming
                 {
                     break;
                 }
-                catch (Exception ex) when (statusCode != HttpStatusCode.OK)
-                {
-                    this.observer.OnError(new FirebaseException(url, string.Empty, line, statusCode, ex));
-                    this.Dispose();
-                    break;
-                }
                 catch (Exception ex)
                 {
-                    this.ExceptionThrown?.Invoke(this, new ExceptionEventArgs<FirebaseException>(new FirebaseException(url, string.Empty, line, statusCode, ex)));
+                    var args = new FirebaseException(url, string.Empty, line, statusCode, ex);
+
+                    if (!this.OnExceptionThrown(args, statusCode == HttpStatusCode.OK))
+                    {
+                        this.observer.OnError(new FirebaseException(url, string.Empty, line, statusCode, ex));
+                        this.Dispose();
+                        break;
+                    }
 
                     await Task.Delay(2000).ConfigureAwait(false);
                 }
             }
+        }
+
+        protected bool OnExceptionThrown(FirebaseException ex, bool ignore)
+        {
+            var args = new ContinueExceptionEventArgs<FirebaseException>(ex, ignore);
+            this.ExceptionThrown?.Invoke(this, args);
+
+            return args.IgnoreAndContinue;
         }
 
         private FirebaseServerEventType ParseServerEvent(FirebaseServerEventType serverEvent, string eventName)
