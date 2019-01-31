@@ -69,6 +69,11 @@
         public event EventHandler<ExceptionEventArgs> SyncExceptionThrown;
 
         /// <summary>
+        /// Event raised when an exception is thrown inside <see cref="firebaseSubscription"/>. Whether they are swalled or not is up to the handler.
+        /// </summary>
+        public event EventHandler<ContinueExceptionEventArgs<FirebaseException>> StreamingExceptionThrown;
+
+        /// <summary>
         /// Gets the backing Database.
         /// </summary>
         public IDictionary<string, OfflineEntry> Database
@@ -298,14 +303,14 @@
                     // stream since the latest key
                     var queryLatest = this.childQuery.OrderByKey().StartAt(() => this.GetLatestKey());
                     this.firebaseSubscription = new FirebaseSubscription<T>(observer, queryLatest, this.elementRoot, this.firebaseCache);
-                    this.firebaseSubscription.ExceptionThrown += this.StreamingExceptionThrown;
+                    this.firebaseSubscription.ExceptionThrown += this.OnStreamingExceptionThrown;
 
                     return new CompositeDisposable(this.firebaseSubscription.Run(), completeDisposable);
                 case StreamingOptions.Everything:
                     // stream everything
                     var queryAll = this.childQuery;
                     this.firebaseSubscription = new FirebaseSubscription<T>(observer, queryAll, this.elementRoot, this.firebaseCache);
-                    this.firebaseSubscription.ExceptionThrown += this.StreamingExceptionThrown;
+                    this.firebaseSubscription.ExceptionThrown += this.OnStreamingExceptionThrown;
 
                     return new CompositeDisposable(this.firebaseSubscription.Run(), completeDisposable);
                 default:
@@ -434,9 +439,9 @@
             }
         }
 
-        private void StreamingExceptionThrown(object sender, ExceptionEventArgs<FirebaseException> e)
+        protected void OnStreamingExceptionThrown(object sender, ContinueExceptionEventArgs<FirebaseException> e)
         {
-            this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(e.Exception));
+            this.StreamingExceptionThrown?.Invoke(this, e);
         }
 
         private Tuple<string, string, bool> GenerateFullKey<TProperty>(string key, Expression<Func<T, TProperty>> propertyGetter, SyncOptions syncOptions)
