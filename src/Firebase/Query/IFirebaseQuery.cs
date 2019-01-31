@@ -32,7 +32,7 @@
         /// </summary>
         /// <typeparam name="T"> Type of the items. </typeparam>
         /// <returns> Cold observable of <see cref="FirebaseEvent{T}"/>. </returns>
-        IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ExceptionEventArgs<FirebaseException>> exceptionHandler, string elementRoot = "");
+        IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ContinueExceptionEventArgs<FirebaseException>> exceptionHandler, string elementRoot = "");
 
         /// <summary>
         /// Builds the actual url of this query.
