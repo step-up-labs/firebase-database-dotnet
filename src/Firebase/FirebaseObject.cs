@@ -6,7 +6,7 @@ namespace Firebase.Database
     /// <typeparam name="T"> Type of the underlying object. </typeparam> 
     public class FirebaseObject<T> 
     {
-        internal FirebaseObject(string key, T obj)
+        public FirebaseObject(string key, T obj)
         {
             this.Key = key;
             this.Object = obj;

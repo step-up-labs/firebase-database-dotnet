@@ -105,17 +105,37 @@ namespace Firebase.Database.Query
             }
         }
 
+        ///// <summary>
+        ///// Starts observing this query watching for changes real time sent by the server.
+        ///// </summary>
+        ///// <typeparam name="T"> Type of elements. </typeparam>
+        ///// <param name="elementRoot"> Optional custom root element of received json items. </param>
+        ///// <returns> Observable stream of <see cref="FirebaseEvent{T}"/>. </returns>
+        //public IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ContinueExceptionEventArgs<FirebaseException>> exceptionHandler = null, string elementRoot = "")
+        //{
+        //    return Observable.Create<FirebaseEvent<T>>(observer =>
+        //    {
+        //        var sub = new FirebaseSubscription<T>(observer, this, elementRoot, new FirebaseCache<T>());
+        //        sub.ExceptionThrown += exceptionHandler;
+        //        return sub.Run();
+        //    });
+        //}
+
         /// <summary>
         /// Starts observing this query watching for changes real time sent by the server.
         /// </summary>
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <returns> Observable stream of <see cref="FirebaseEvent{T}"/>. </returns>
-        public IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ContinueExceptionEventArgs<FirebaseException>> exceptionHandler = null, string elementRoot = "")
+        public IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ContinueExceptionEventArgs<FirebaseException>> exceptionHandler = null, string elementRoot = "", FirebaseCache<T> cache=null)
         {
             return Observable.Create<FirebaseEvent<T>>(observer =>
             {
-                var sub = new FirebaseSubscription<T>(observer, this, elementRoot, new FirebaseCache<T>());
+                if (cache==null)
+                {
+                    cache = new FirebaseCache<T>();
+                }
+                var sub = new FirebaseSubscription<T>(observer, this, elementRoot, cache);
                 sub.ExceptionThrown += exceptionHandler;
                 return sub.Run();
             });

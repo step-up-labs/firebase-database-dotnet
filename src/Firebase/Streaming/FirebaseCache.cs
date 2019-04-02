@@ -47,7 +47,7 @@ namespace Firebase.Database.Streaming
         /// <param name="path"> The path of incoming data, separated by slash. </param>  
         /// <param name="data"> The data in json format as returned by firebase. </param>  
         /// <returns> Collection of top-level entities which were affected by the push. </returns>
-        public IEnumerable<FirebaseObject<T>> PushData(string path, string data, bool removeEmptyEntries = true)
+        public virtual IEnumerable<FirebaseObject<T>> PushData(string path, string data, bool removeEmptyEntries = true)
         {
             object obj = this.dictionary;
             Action<object> primitiveObjSetter = null;
@@ -162,7 +162,7 @@ namespace Firebase.Database.Streaming
             }
         }
 
-        public bool Contains(string key)
+        public virtual bool Contains(string key)
         {
             return this.dictionary.Keys.Contains(key);
         }
@@ -186,7 +186,7 @@ namespace Firebase.Database.Streaming
             return this.GetEnumerator();
         }
 
-        public IEnumerator<FirebaseObject<T>> GetEnumerator()
+        public virtual IEnumerator<FirebaseObject<T>> GetEnumerator()
         {
             return this.dictionary.Select(p => new FirebaseObject<T>(p.Key, p.Value)).GetEnumerator();
         }
