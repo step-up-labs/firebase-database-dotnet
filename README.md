@@ -25,7 +25,7 @@ Install-Package FirebaseDatabase.net -pre
 
 The simplest solution where you only use your app secret is as follows:
 
-```
+```csharp
 var auth = "ABCDE"; // your app secret
 var firebaseClient = new FirebaseClient(
   "<URL>",
@@ -37,7 +37,7 @@ var firebaseClient = new FirebaseClient(
 
 Note that using app secret can only be done for server-side scenarios. Otherwise you should use some sort of third-party login. 
 
-```
+```csharp
 var firebaseClient = new FirebaseClient(
   "<URL>",
   new FirebaseOptions
