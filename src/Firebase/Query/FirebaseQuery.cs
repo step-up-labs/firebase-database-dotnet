@@ -164,6 +164,29 @@ namespace Firebase.Database.Query
                 return new FirebaseObject<string>(result.Name, data);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="definedKey"></param>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public async Task<FirebaseObject<string>> PostAsync(string data, string definedKey)
+        {
+            //ensure the key parsed is not an empty string and must have a value
+            if (!string.IsNullOrEmpty(definedKey) && !string.IsNullOrEmpty(data)){
+                // definedKey here is parsed by the user, this is the key the user want to use while creating the node on firebase
+                await new ChildQuery(this, () => definedKey, this.Client).PutAsync(data).ConfigureAwait(false);
+                return new FirebaseObject<string>(definedKey, data);
+            }
+            else
+            {
+                //otherwise return null 
+                return new FirebaseObject<string>(null, null);
+            }
+            
+
+        }
 
         /// <summary>
         /// Patches data at given location instead of overwriting them.

@@ -90,6 +90,13 @@ var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var dino = await firebase
   .Child("dinosaurs")
   .PostAsync(new Dinosaur());
+
+
+// add new item to list of data and let the user parse their own generated key 
+string generatedKey = Guid.NewGuid().ToString();
+var dino = await firebase
+  .Child("dinosaurs")
+  .PostAsync(new Dinosaur(), generatedKey);
   
 // note that there is another overload for the PostAsync method which delegates the new key generation to the firebase server
   
@@ -100,6 +107,7 @@ await firebase
   .Child("dinosaurs")
   .Child("t-rex")
   .PutAsync(new Dinosaur());
+  
 
 // delete given child node
 await firebase
