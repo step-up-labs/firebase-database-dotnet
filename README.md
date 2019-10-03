@@ -60,10 +60,12 @@ As you can se, the AuthTokenAsyncFactory is of type `Func<Task<string>>`. This i
 
 ### Querying
 
+#### C#
 ```csharp
 using Firebase.Database;
 using Firebase.Database.Query;
-...
+
+' Since the dinosaur-facts repo no longer works, populate your own one with sample data in "sample.json"
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var dinos = await firebase
   .Child("dinosaurs")
@@ -76,6 +78,26 @@ foreach (var dino in dinos)
 {
   Console.WriteLine($"{dino.Key} is {dino.Object.Height}m high.");
 }
+```
+
+#### VB.net
+```vbnet
+Imports Firebase.Database
+Imports Firebase.Database.Query
+
+' Since the dinosaur-facts repo no longer works, populate your own one with sample data in "sample.json"
+Dim client = New FirebaseClient("https://dinosaur-facts.firebaseio.com/")
+
+Dim dinos = Await client _
+    .Child("dinosaurs") _
+    .OrderByKey() _
+    .StartAt("pterodactyl") _
+    .LimitToFirst(2) _
+    .OnceAsync(Of Dinosaur)
+
+For Each dino In dinos
+    Console.WriteLine($"{dino.Key} is {dino.Object.Height}m high.")
+Next
 ```
 
 ### Saving & deleting data
@@ -110,9 +132,11 @@ await firebase
 
 ### Realtime streaming
 
+#### C#
 ```csharp
 using Firebase.Database;
 using Firebase.Database.Query;
+using System.Reactive.Linq;
 ...
 var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 var observable = firebase
@@ -120,6 +144,20 @@ var observable = firebase
   .AsObservable<Dinosaur>()
   .Subscribe(d => Console.WriteLine(d.Key));
   
+```
+
+#### VB.net
+```vbnet
+Imports System.Reactive.Linq
+Imports Firebase.Database
+Imports Firebase.Database.Query
+' ...
+Dim client = New FirebaseClient("https://dinosaur-facts.firebaseio.com/")
+
+child _
+  .Child("dinosaurs") _
+  .AsObservable(Of InboundMessage) _
+  .Subscribe(Sub(f) Console.WriteLine(f.Key))
 ```
 
 ```AsObservable<T>``` methods returns an ```IObservable<T>``` which you can take advantage of using [Reactive Extensions](https://github.com/Reactive-Extensions/Rx.NET)
