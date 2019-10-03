@@ -1,9 +1,10 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dinosaurs", "Dinosaurs\Dinosaurs.csproj", "{6BD03260-DBB5-4660-8884-41BE3B1DBE1D}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Dinosaurs.VisualBasic", "Dinosaurs.VisualBasic\Dinosaurs.VisualBasic.vbproj", "{AFC9B7E6-FB9D-44DF-991E-1B9901ED54A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +16,15 @@ Global
 		{6BD03260-DBB5-4660-8884-41BE3B1DBE1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BD03260-DBB5-4660-8884-41BE3B1DBE1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BD03260-DBB5-4660-8884-41BE3B1DBE1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFC9B7E6-FB9D-44DF-991E-1B9901ED54A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFC9B7E6-FB9D-44DF-991E-1B9901ED54A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFC9B7E6-FB9D-44DF-991E-1B9901ED54A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFC9B7E6-FB9D-44DF-991E-1B9901ED54A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B540CD96-CB08-4584-B075-84C84AFF61B4}
 	EndGlobalSection
 EndGlobal

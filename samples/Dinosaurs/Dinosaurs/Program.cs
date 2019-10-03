@@ -15,6 +15,8 @@
 
         private async Task Run()
         {
+            // Since the dinosaur-facts repo no longer works, populate your own one with sample data
+            // in "sample.json"
             var firebase = new FirebaseClient("https://dinosaur-facts.firebaseio.com/");
 
             var dinos = await firebase

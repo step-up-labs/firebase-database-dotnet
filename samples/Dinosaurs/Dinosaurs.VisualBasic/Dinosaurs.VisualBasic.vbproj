@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Dinosaurs</RootNamespace>
+    <RootNamespace>Dinosaurs.VisualBasic</RootNamespace>
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="FirebaseDatabase.net" Version="4.0.1" />
   </ItemGroup>
