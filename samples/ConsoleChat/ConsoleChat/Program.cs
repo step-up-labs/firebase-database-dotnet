@@ -22,7 +22,6 @@
             var name = Console.ReadLine();
 
             Console.WriteLine("*******************************************************");
-            Console.WriteLine("Start chatting");
 
             var client = new FirebaseClient("https://yourfirebase.firebaseio.com/");
             var child = client.Child("messages");
@@ -31,6 +30,8 @@
             
             // delete entire conversation list
             await child.DeleteAsync();
+
+            Console.WriteLine("Start chatting");
 
             // subscribe to messages comming in, ignoring the ones that are from me
             var subscription = observable
