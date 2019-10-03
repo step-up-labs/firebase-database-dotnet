@@ -17,11 +17,12 @@
         private static async Task Run()
         {
             Console.WriteLine("You can run this application multiple times to simulate chat between multiple users");
-            Console.WriteLine("What's your name?");
+            Console.Write("What's your name? ");
 
             var name = Console.ReadLine();
 
             Console.WriteLine("*******************************************************");
+            Console.WriteLine("Start chatting");
 
             var client = new FirebaseClient("https://yourfirebase.firebaseio.com/");
             var child = client.Child("messages");
