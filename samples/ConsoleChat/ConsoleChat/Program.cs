@@ -1,10 +1,11 @@
 ﻿namespace Firebase.ConsoleChat
 {
     using System;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
 
     using Firebase.Database;
-    using System.Reactive.Linq;
+    using Firebase.Database.Query;
 
     public class Program
     {
@@ -15,6 +16,7 @@
 
         private static async Task Run()
         {
+            Console.WriteLine("You can run this application multiple times to simulate chat between multiple users");
             Console.WriteLine("What's your name?");
 
             var name = Console.ReadLine();
