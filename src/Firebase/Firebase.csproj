@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>FirebaseDatabase.net</PackageId>
-    <PackageVersion>4.0.1</PackageVersion>
+    <PackageVersion>4.0.2</PackageVersion>
     <Authors>Step Up Labs, Inc.</Authors>
     <Description>Complex C# library for Firebase Realtime Database built on top of Firebase REST API. Among others it supports following:
 
@@ -21,7 +21,7 @@
     <PackageLicenseUrl>https://github.com/step-up-labs/firebase-database-dotnet/blob/master/LICENSE</PackageLicenseUrl>
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
-    <Copyright>Step Up Labs, Inc. 2017</Copyright>
+    <Copyright>Step Up Labs, Inc. 2019</Copyright>
     <PackageTags>Firebase Database Realtime</PackageTags>
   </PropertyGroup>
 

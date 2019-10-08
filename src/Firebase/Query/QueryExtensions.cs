@@ -32,6 +32,17 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
+        /// Appends shallow=true to the url parameters. This cannot be used with any other filtering parameters.
+        /// See https://firebase.google.com/docs/database/rest/retrieve-data
+        /// </summary>
+        /// <param name="node"> The child. </param>
+        /// <returns> The <see cref="ShallowQuery"/>. </returns>
+        public static ShallowQuery Shallow(this ChildQuery node)
+        {
+            return new ShallowQuery(node, node.Client);
+        }
+
+        /// <summary>
         /// References a sub child of the existing node.
         /// </summary>
         /// <param name="node"> The child. </param>
