@@ -149,14 +149,17 @@
         /// <summary>
         /// Fetches everything from the remote database.
         /// </summary>
-        public async Task PullAsync()
+        /// <param name="retryCount">
+        /// The number of attempts of running the source observable before failing.
+        /// null means infinite retries, 0 means it won't execute at all, and 1 means it will only try once.
+        /// </param>
+        public async Task PullAsync(int? retryCount = null)
         {
-            var existingEntries = await this.childQuery
-                .OnceAsync<T>()
-                .ToObservable()
+            var existingEntries = await Observable.Defer(() => this.childQuery.OnceAsync<T>().ToObservable())
                 .RetryAfterDelay<IReadOnlyCollection<FirebaseObject<T>>, FirebaseException>(
                     this.childQuery.Client.Options.SyncPeriod,
-                    ex => ex.StatusCode == System.Net.HttpStatusCode.OK) // OK implies the request couldn't complete due to network error. 
+                    ex => ex.StatusCode == System.Net.HttpStatusCode.OK, // OK implies the request couldn't complete due to network error. 
+                    retryCount)
                 .Select(e => this.ResetDatabaseFromInitial(e, false))
                 .SelectMany(e => e)
                 .Do(e => 
