@@ -172,11 +172,11 @@ namespace Firebase.Database.Query
         /// <param name="timeout"> Optional timeout value. </param>
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PatchAsync(string data, TimeSpan? timeout = null)
+        public Task PatchAsync(string data, TimeSpan? timeout = null)
         {
             var c = this.GetClient(timeout);
 
-            await this.Silent().SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
+            return this.Silent().SendAsync(c, data, new HttpMethod("PATCH"));
         }
 
         /// <summary>
@@ -186,11 +186,11 @@ namespace Firebase.Database.Query
         /// <param name="timeout"> Optional timeout value. </param>
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PutAsync(string data, TimeSpan? timeout = null)
+        public Task PutAsync(string data, TimeSpan? timeout = null)
         {
             var c = this.GetClient(timeout);
 
-            await this.Silent().SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
+            return this.Silent().SendAsync(c, data, HttpMethod.Put);
         }
 
         /// <summary>

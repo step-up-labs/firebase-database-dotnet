@@ -293,7 +293,7 @@
             }
             
             // there is an element root, which indicates the target location is not a collection but a single element
-            return Observable.Defer(async () => Observable.Return(await query.OnceSingleAsync<T>()).Select(e => new[] { new FirebaseObject<T>(this.elementRoot, e) }));
+            return Observable.Defer(async () => Observable.Return(await query.OnceSingleAsync<T>().ConfigureAwait(false)).Select(e => new[] { new FirebaseObject<T>(this.elementRoot, e) }));
         }
 
         private IDisposable InitializeStreamingSubscription(IObserver<FirebaseEvent<T>> observer)
@@ -336,11 +336,11 @@
                 try
                 {
                     var validEntries = this.Database.Where(e => e.Value != null);
-                    await this.PullEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Pull));
+                    await PullEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Pull)).ConfigureAwait(false);
 
                     if (this.pushChanges)
                     {
-                        await this.PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Put || kvp.Value.SyncOptions == SyncOptions.Patch));
+                        await PushEntriesAsync(validEntries.Where(kvp => kvp.Value.SyncOptions == SyncOptions.Put || kvp.Value.SyncOptions == SyncOptions.Patch)).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)
@@ -348,7 +348,7 @@
                     this.SyncExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
                 }
 
-                await Task.Delay(this.childQuery.Client.Options.SyncPeriod);
+                await Task.Delay(childQuery.Client.Options.SyncPeriod).ConfigureAwait(false);
             }
         }
 
@@ -377,7 +377,7 @@
 
                 try
                 {
-                    await Task.WhenAll(tasks).WithAggregateException();
+                    await Task.WhenAll(tasks).WithAggregateException().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -396,7 +396,7 @@
 
                 try
                 { 
-                    await Task.WhenAll(tasks).WithAggregateException();
+                    await Task.WhenAll(tasks).WithAggregateException().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -407,13 +407,13 @@
 
         private async Task ResetAfterPull(Task<T> task, string key, OfflineEntry entry)
         {
-            await task;
+            await task.ConfigureAwait(false);
             this.SetAndRaise(key, new OfflineEntry(key, task.Result, entry.Priority, SyncOptions.None), FirebaseEventSource.OnlinePull);
         }
 
         private async Task ResetSyncAfterPush(Task task, string key, T obj)
         {
-            await this.ResetSyncAfterPush(task, key);
+            await ResetSyncAfterPush(task, key).ConfigureAwait(false);
 
             if (this.streamingOptions == StreamingOptions.None)
             {
@@ -423,7 +423,7 @@
 
         private async Task ResetSyncAfterPush(Task task, string key)
         {
-            await task;
+            await task.ConfigureAwait(false);
             this.ResetSyncOptions(key);
         }
 

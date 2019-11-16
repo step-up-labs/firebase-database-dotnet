@@ -219,7 +219,7 @@ namespace Firebase.Database.Query
 
         public static async Task<FirebaseObject<T>> PostAsync<T>(this FirebaseQuery query, T obj, bool generateKeyOffline = true)
         {
-            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings), generateKeyOffline);
+            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings), generateKeyOffline).ConfigureAwait(false);
 
             return new FirebaseObject<T>(result.Key, obj);
         }
@@ -231,7 +231,7 @@ namespace Firebase.Database.Query
         /// <param name="query"> Current node. </param>
         /// <param name="item"> Object to fan out. </param>
         /// <param name="relativePaths"> Locations where to store the item. </param>
-        public static async Task FanOut<T>(this ChildQuery child, T item, params string[] relativePaths)
+        public static Task FanOut<T>(this ChildQuery child, T item, params string[] relativePaths)
         {
             if (relativePaths == null)
             {
@@ -245,7 +245,7 @@ namespace Firebase.Database.Query
                 fanoutObject.Add(path, item);
             }
 
-            await child.PatchAsync(fanoutObject);
+            return child.PatchAsync(fanoutObject);
         }
     }
 }

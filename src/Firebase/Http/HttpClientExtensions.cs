@@ -41,7 +41,7 @@ namespace Firebase.Database.Http
 
                 if (dictionary == null)
                 {
-                    return new FirebaseObject<T>[0];
+                    return Array.Empty<FirebaseObject<T>>();
                 }
 
                 return dictionary.Select(item => new FirebaseObject<T>(item.Key, item.Value)).ToList();
