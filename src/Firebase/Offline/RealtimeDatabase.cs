@@ -43,9 +43,10 @@
         /// <param name="elementRoot"> The element Root. </param>
         /// <param name="offlineDatabaseFactory"> The offline database factory.  </param>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name.  </param>
-        /// <param name="streamChanges"> Specifies whether changes should be streamed from the server.  </param>
-        /// <param name="pullEverythingOnStart"> Specifies if everything should be pull from the online storage on start. It only makes sense when <see cref="streamChanges"/> is set to true. </param>
+        /// <param name="streamingOptions"> Specifies condition for which items get streamed. </param>
+        /// <param name="initialPullStrategy"> Specifies the strategy for initial pull of server data. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. If this is false, then Put / Post / Delete will not affect server data. </param>
+        /// <param name="setHandler"></param>
         public RealtimeDatabase(ChildQuery childQuery, string elementRoot, Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier, StreamingOptions streamingOptions, InitialPullStrategy initialPullStrategy, bool pushChanges, ISetHandler<T> setHandler = null)
         {
             this.childQuery = childQuery;
@@ -93,7 +94,7 @@
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object to set. </param>
-        /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
+        /// <param name="syncOptions"> Specifies type of sync requested for given data. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         public void Set(string key, T obj, SyncOptions syncOptions, int priority = 1)
         {

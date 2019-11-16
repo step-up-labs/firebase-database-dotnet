@@ -12,6 +12,7 @@ namespace Firebase.Database.Streaming
         /// <param name="key"> The key of the object. </param>
         /// <param name="obj"> The object. </param>
         /// <param name="eventType"> The event type. </param>
+        /// <param name="eventSource"> The origin of this event. </param>
         public FirebaseEvent(string key, T obj, FirebaseEventType eventType, FirebaseEventSource eventSource)
             : base(key, obj)
         {

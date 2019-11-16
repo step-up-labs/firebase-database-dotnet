@@ -13,6 +13,7 @@
         /// Create new instances of the <see cref="RealtimeDatabase{T}"/>.
         /// </summary>
         /// <typeparam name="T"> Type of elements. </typeparam>
+        /// <param name="query"> The child query. </param>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
         /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <param name="streamingOptions"> Realtime streaming options. </param> 
@@ -30,6 +31,7 @@
         /// </summary>
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <typeparam name="TSetHandler"> Type of the custom <see cref="ISetHandler{T}"/> to use. </typeparam>
+        /// <param name="query"> The child query. </param>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
         /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <param name="streamingOptions"> Realtime streaming options. </param> 
@@ -46,6 +48,7 @@
         /// <summary>
         /// Overwrites existing object with given key leaving any missing properties intact in firebase.
         /// </summary>
+        /// <param name="db"> Database instance. </param>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object to set. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
@@ -59,6 +62,7 @@
         /// <summary>
         /// Overwrites existing object with given key.
         /// </summary>
+        /// <param name="db"> Database instance. </param>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object to set. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
@@ -72,6 +76,7 @@
         /// <summary>
         /// Adds a new entity to the Database.
         /// </summary>
+        /// <param name="db"> Database instance. </param>
         /// <param name="obj"> The object to add.  </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
@@ -89,6 +94,7 @@
         /// <summary>
         /// Deletes the entity with the given key.
         /// </summary>
+        /// <param name="db"> Database instance. </param>
         /// <param name="key"> The key. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
@@ -140,7 +146,6 @@
         /// <param name="db"> Database instance. </param>
         /// <param name="key"> Key of the root element to modify. </param>
         /// <param name="propertyExpression"> Expression on the root element leading to target value to modify. </param>
-        /// <param name="value"> Value to put. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
         public static void Delete<T, TProperty>(this RealtimeDatabase<T> db, string key, Expression<Func<T, TProperty>> propertyExpression, bool syncOnline = true, int priority = 1)
@@ -177,7 +182,6 @@
         /// The key of the new entity is automatically generated.
         /// </summary>
         /// <typeparam name="T"> Type of the root elements. </typeparam>
-        /// <typeparam name="TSelector"> Type of the dictionary being modified</typeparam>
         /// <typeparam name="TProperty"> Type of the value within the dictionary being modified</typeparam>
         /// <param name="db"> Database instance. </param>
         /// <param name="key"> Key of the root element to modify. </param>

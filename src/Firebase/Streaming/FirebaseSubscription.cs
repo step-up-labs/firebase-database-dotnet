@@ -49,6 +49,7 @@ namespace Firebase.Database.Streaming
         /// </summary>
         /// <param name="observer"> The observer.  </param>
         /// <param name="query"> The query.  </param>
+        /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <param name="cache"> The cache. </param>
         public FirebaseSubscription(IObserver<FirebaseEvent<T>> observer, IFirebaseQuery query, string elementRoot, FirebaseCache<T> cache)
         {

@@ -16,8 +16,10 @@
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>  
+        /// <param name="data"> The json data. </param>
+        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         /// <param name="syncOptions"> The sync options. </param>
+        /// <param name="isPartial"> A value indicating whether this is only a partial object. </param>
         public OfflineEntry(string key, object obj, string data, int priority, SyncOptions syncOptions, bool isPartial = false)
         {
             this.Key = key;
@@ -37,6 +39,7 @@
         /// <param name="obj"> The object. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>  
         /// <param name="syncOptions"> The sync options. </param>
+        /// <param name="isPartial"> A value indicating whether this is only a partial object. </param>
         public OfflineEntry(string key, object obj, int priority, SyncOptions syncOptions, bool isPartial = false)
             : this(key, obj, JsonConvert.SerializeObject(obj), priority, syncOptions, isPartial)
         {

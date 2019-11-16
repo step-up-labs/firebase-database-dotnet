@@ -7,7 +7,7 @@ namespace Firebase.Database
     /// Offline key generator which mimics the official Firebase generators. 
     /// Credit: https://github.com/bubbafat/FirebaseSharp/blob/master/src/FirebaseSharp.Portable/FireBasePushIdGenerator.cs
     /// </summary>
-    public class FirebaseKeyGenerator 
+    public static class FirebaseKeyGenerator 
     {
         // Modeled after base64 web-safe chars, but ordered by ASCII.
         private const string PushCharsString = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
