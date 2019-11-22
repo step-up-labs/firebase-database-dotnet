@@ -30,7 +30,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Order data by given <see cref="propertyNameFactory"/>. Note that this is used mainly for following filtering queries and due to firebase implementation
+        /// Order data by given <paramref name="propertyNameFactory"/>. Note that this is used mainly for following filtering queries and due to firebase implementation
         /// the data may actually not be ordered.
         /// </summary>
         /// <param name="child"> The child. </param>
@@ -75,7 +75,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data greater or equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data greater or equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -86,7 +86,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data lower or equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data lower or equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -97,7 +97,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -108,7 +108,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data greater or equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data greater or equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -119,7 +119,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data lower or equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data lower or equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -130,7 +130,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -141,7 +141,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data greater or equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data greater or equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -152,7 +152,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data lower or equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data lower or equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -163,7 +163,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -174,7 +174,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
@@ -182,10 +182,10 @@ namespace Firebase.Database.Query
         public static FilterQuery EqualTo(this ParameterQuery child, Func<bool> valueFactory)
         {
             return new FilterQuery(child, () => "equalTo", valueFactory, child.Client);
-        }		
+        }
 
         /// <summary>
-        /// Limits the result to first <see cref="countFactory"/> items.
+        /// Limits the result to first <paramref name="countFactory"/> items.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="countFactory"> Number of elements. </param>
@@ -196,7 +196,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Limits the result to last <see cref="countFactory"/> items.
+        /// Limits the result to last <paramref name="countFactory"/> items.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="countFactory"> Number of elements. </param>
