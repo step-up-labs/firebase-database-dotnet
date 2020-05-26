@@ -1,14 +1,12 @@
-namespace Firebase.Database.Streaming
+﻿namespace Firebase.Database.Streaming
 {
+    using Firebase.Database.Http;
+    using Newtonsoft.Json;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-
-    using Firebase.Database.Http;
-
-    using Newtonsoft.Json;
 
     /// <summary>
     /// The firebase cache.
@@ -26,7 +24,7 @@ namespace Firebase.Database.Streaming
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseCache{T}"/> class.
         /// </summary>
-        public FirebaseCache() 
+        public FirebaseCache()
             : this(new Dictionary<string, T>())
         {
         }
@@ -76,6 +74,28 @@ namespace Firebase.Database.Streaming
                     {
                         dictionary[element] = this.CreateInstance(valueType);
                         obj = dictionary[element];
+                    }
+                }
+                else if (obj is IList)
+                {
+                    var list = obj as IList;
+                    var valueType = obj.GetType().GetGenericArguments()[0];
+                    var index = Convert.ToInt32(element);
+
+                    primitiveObjSetter = (d) => list[index] = d;
+                    objDeleter = () => list.RemoveAt(index);
+
+                    if (index < list.Count)
+                    {
+                        obj = list[index];
+                    }
+                    else
+                    {
+                        for (int i = 0; i < index + 1; i++)
+                        {
+                            list.Add(this.CreateInstance(valueType));
+                        }
+                        obj = list[index];
                     }
                 }
                 else
@@ -146,7 +166,8 @@ namespace Firebase.Database.Streaming
                 // firebase sends strings without double quotes
                 var targetObject = valueType == typeof(string) ? data.ToString() : JsonConvert.DeserializeObject(data, valueType);
 
-                if ((valueType.GetTypeInfo().IsPrimitive || valueType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(valueType)) && primitiveObjSetter != null)
+                if ((valueType.IsEnum || valueType.GetTypeInfo().IsPrimitive || valueType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(valueType))
+                        && primitiveObjSetter != null)
                 {
                     // handle primitive (value) types separately
                     primitiveObjSetter(targetObject);
