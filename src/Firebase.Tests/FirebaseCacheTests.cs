@@ -1,15 +1,13 @@
 ﻿namespace Firebase.Database.Tests
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Firebase.Database;
     using Firebase.Database.Streaming;
     using Firebase.Database.Tests.Entities;
-
     using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json;
+    using System.Collections.Generic;
+    using System.Linq;
 
     [TestClass]
     public class FirebaseCacheTests
@@ -339,7 +337,7 @@
             cache.PushData("root/", data).ToList();
             var entities = cache.PushData("root/a", updateData).ToList();
 
-            entities.First().Should().BeEquivalentTo(new FirebaseObject<Dictionary<string, string>>("root",  new Dictionary<string, string>()
+            entities.First().Should().BeEquivalentTo(new FirebaseObject<Dictionary<string, string>>("root", new Dictionary<string, string>()
             {
                 ["a"] = "aaa",
                 ["b"] = "bb",
@@ -426,6 +424,45 @@
 
             cache.PushData("updates/", original);
             var entities = cache.PushData("updates/", incoming);
+
+            entities.Should().BeEquivalentTo(expectation);
+        }
+
+        [TestMethod]
+        public void CanUpdateObjectInsideList()
+        {
+            var cache = new FirebaseCache<HandOfCards>();
+            var original = @"
+                {
+                    ""Cards"": [
+                        { ""Suit"": 0 },
+                    ]
+                }
+            ";
+            var newObject = @"
+                {
+                    ""Cards"": [
+                        { ""Suit"": 2 },
+                    ]
+                }
+            ";
+            var expectation = new[] { new FirebaseObject<HandOfCards>("HandOfCards", JsonConvert.DeserializeObject<HandOfCards>(newObject)) };
+
+            cache.PushData("HandOfCards/", original);
+            var entities = cache.PushData("HandOfCards/Cards/0/Suit", "2");
+
+            entities.Should().BeEquivalentTo(expectation);
+        }
+
+        [TestMethod]
+        public void CanUpdateEnumInObject()
+        {
+            var cache = new FirebaseCache<Card>();
+            var newObject = @"{ ""Suit"": 2 }";
+            var expectation = new[] { new FirebaseObject<Card>("Card", JsonConvert.DeserializeObject<Card>(newObject)) };
+
+            cache.PushData("Card/", @"{ ""Suit"": 0 }");
+            var entities = cache.PushData("Card/Suit", "2");
 
             entities.Should().BeEquivalentTo(expectation);
         }
