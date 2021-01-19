@@ -109,6 +109,7 @@ namespace Firebase.Database.Query
         /// Starts observing this query watching for changes real time sent by the server.
         /// </summary>
         /// <typeparam name="T"> Type of elements. </typeparam>
+        /// <param name="exceptionHandler"> Optional exception handler for the stream subscription. </param>
         /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <returns> Observable stream of <see cref="FirebaseEvent{T}"/>. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ContinueExceptionEventArgs<FirebaseException>> exceptionHandler = null, string elementRoot = "")
@@ -140,10 +141,9 @@ namespace Firebase.Database.Query
         /// <summary>
         /// Posts given object to repository.
         /// </summary>
-        /// <param name="obj"> The object. </param>
+        /// <param name="data"> The json data. </param>
         /// <param name="generateKeyOffline"> Specifies whether the key should be generated offline instead of online. </param>
         /// <param name="timeout"> Optional timeout value. </param>
-        /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> Resulting firebase object with populated key. </returns>
         public async Task<FirebaseObject<string>> PostAsync(string data, bool generateKeyOffline = true, TimeSpan? timeout = null)
         {
@@ -168,29 +168,27 @@ namespace Firebase.Database.Query
         /// <summary>
         /// Patches data at given location instead of overwriting them.
         /// </summary> 
-        /// <param name="obj"> The object. </param>
+        /// <param name="data"> The json data. </param>
         /// <param name="timeout"> Optional timeout value. </param>
-        /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PatchAsync(string data, TimeSpan? timeout = null)
+        public Task PatchAsync(string data, TimeSpan? timeout = null)
         {
             var c = this.GetClient(timeout);
 
-            await this.Silent().SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
+            return this.Silent().SendAsync(c, data, new HttpMethod("PATCH"));
         }
 
         /// <summary>
         /// Sets or overwrites data at given location.
         /// </summary> 
-        /// <param name="obj"> The object. </param>
+        /// <param name="data"> The json data. </param>
         /// <param name="timeout"> Optional timeout value. </param>
-        /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public async Task PutAsync(string data, TimeSpan? timeout = null)
+        public Task PutAsync(string data, TimeSpan? timeout = null)
         {
             var c = this.GetClient(timeout);
 
-            await this.Silent().SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
+            return this.Silent().SendAsync(c, data, HttpMethod.Put);
         }
 
         /// <summary>

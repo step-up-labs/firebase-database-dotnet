@@ -25,7 +25,7 @@ namespace Firebase.Database
         /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
         /// </summary>
         /// <param name="baseUrl"> The base url. </param>
-        /// <param name="offlineDatabaseFactory"> Offline database. </param>  
+        /// <param name="options"> The Firebase options. </param>  
         public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
             this.Options = options ?? new FirebaseOptions();

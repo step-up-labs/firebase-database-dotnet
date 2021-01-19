@@ -54,7 +54,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Order data by given <see cref="propertyName"/>. Note that this is used mainly for following filtering queries and due to firebase implementation
+        /// Order data by given <paramref name="propertyName"/>. Note that this is used mainly for following filtering queries and due to firebase implementation
         /// the data may actually not be ordered.
         /// </summary>
         /// <param name="child"> The child. </param>
@@ -66,7 +66,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data greater or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data greater or equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -77,7 +77,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data lower or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data lower or equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -88,7 +88,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -99,7 +99,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data greater or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data greater or equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -110,7 +110,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data lower or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data lower or equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -121,7 +121,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -132,7 +132,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data greater or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data greater or equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -143,7 +143,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data lower or equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data lower or equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -154,7 +154,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -165,7 +165,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
+        /// Instructs firebase to send data equal to the <paramref name="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="value"> Value to start at. </param>
@@ -186,7 +186,7 @@ namespace Firebase.Database.Query
         }        
 
         /// <summary>
-        /// Limits the result to first <see cref="count"/> items.
+        /// Limits the result to first <paramref name="count"/> items.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="count"> Number of elements. </param>
@@ -197,7 +197,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Limits the result to last <see cref="count"/> items.
+        /// Limits the result to last <paramref name="count"/> items.
         /// </summary>
         /// <param name="child"> Current node. </param>
         /// <param name="count"> Number of elements. </param>
@@ -219,7 +219,7 @@ namespace Firebase.Database.Query
 
         public static async Task<FirebaseObject<T>> PostAsync<T>(this FirebaseQuery query, T obj, bool generateKeyOffline = true)
         {
-            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings), generateKeyOffline);
+            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings), generateKeyOffline).ConfigureAwait(false);
 
             return new FirebaseObject<T>(result.Key, obj);
         }
@@ -231,7 +231,7 @@ namespace Firebase.Database.Query
         /// <param name="query"> Current node. </param>
         /// <param name="item"> Object to fan out. </param>
         /// <param name="relativePaths"> Locations where to store the item. </param>
-        public static async Task FanOut<T>(this ChildQuery child, T item, params string[] relativePaths)
+        public static Task FanOut<T>(this ChildQuery query, T item, params string[] relativePaths)
         {
             if (relativePaths == null)
             {
@@ -245,7 +245,7 @@ namespace Firebase.Database.Query
                 fanoutObject.Add(path, item);
             }
 
-            await child.PatchAsync(fanoutObject);
+            return query.PatchAsync(fanoutObject);
         }
     }
 }

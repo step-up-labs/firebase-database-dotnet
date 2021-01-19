@@ -1,7 +1,7 @@
 namespace Firebase.Database
 {
     /// <summary>
-    /// Holds the object of type <typeparam name="T" /> along with its key. 
+    /// Holds the object of type <typeparamref name="T" /> along with its key. 
     /// </summary>
     /// <typeparam name="T"> Type of the underlying object. </typeparam> 
     public class FirebaseObject<T> 

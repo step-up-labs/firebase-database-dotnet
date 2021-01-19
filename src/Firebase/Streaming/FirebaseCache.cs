@@ -45,7 +45,8 @@ namespace Firebase.Database.Streaming
         /// The push data.
         /// </summary>
         /// <param name="path"> The path of incoming data, separated by slash. </param>  
-        /// <param name="data"> The data in json format as returned by firebase. </param>  
+        /// <param name="data"> The data in json format as returned by firebase. </param>
+        /// <param name="removeEmptyEntries"> A value indicating whether empty entries should be removed. </param>  
         /// <returns> Collection of top-level entities which were affected by the push. </returns>
         public IEnumerable<FirebaseObject<T>> PushData(string path, string data, bool removeEmptyEntries = true)
         {
