@@ -354,7 +354,7 @@
 
         private string GetLatestKey()
         {
-            var key = this.Database.OrderBy(o => o.Key, StringComparer.Ordinal).LastOrDefault().Key ?? string.Empty;
+            var key = this.Database.OrderBy(o => o.Key, StringComparer.Ordinal).LastOrDefault().Key ?? " ";
 
             if (!string.IsNullOrWhiteSpace(key))
             {
