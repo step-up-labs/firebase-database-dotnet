@@ -58,6 +58,9 @@ public static async Task<string> LoginAsync()
 
 As you can se, the AuthTokenAsyncFactory is of type `Func<Task<string>>`. This is to allow refreshing the expired token in streaming scenarios, in which case the func is called to get a fresh token.
 
+#### Using service account
+See [this issue](https://github.com/step-up-labs/firebase-database-dotnet/issues/221#issuecomment-704583145)
+
 ### Querying
 
 #### C#
