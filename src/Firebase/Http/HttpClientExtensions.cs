@@ -23,7 +23,7 @@ namespace Firebase.Database.Http
         /// <param name="jsonSerializerSettings"> The specific JSON Serializer Settings. </param>  
         /// <typeparam name="T"> The type of entities the collection should contain. </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(this HttpClient client, string requestUri,
+        public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectDictionaryCollectionAsync<T>(this HttpClient client, string requestUri,
             JsonSerializerSettings jsonSerializerSettings)
         {
             var responseData = string.Empty;
@@ -45,6 +45,42 @@ namespace Firebase.Database.Http
                 }
 
                 return dictionary.Select(item => new FirebaseObject<T>(item.Key, item.Value)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException(requestUri, string.Empty, responseData, statusCode, ex);
+            }
+        }
+
+        /// <summary>
+        /// The get object collection async as list.
+        /// </summary>
+        /// <param name="client"> The client. </param>
+        /// <param name="requestUri"> The request uri. </param>  
+        /// <param name="jsonSerializerSettings"> The specific JSON Serializer Settings. </param>  
+        /// <typeparam name="T"> The type of entities the collection should contain. </typeparam>
+        /// <returns> The <see cref="Task"/>. </returns>
+        public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(this HttpClient client, string requestUri,
+            JsonSerializerSettings jsonSerializerSettings)
+        {
+            var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
+
+            try
+            {
+                var response = await client.GetAsync(requestUri).ConfigureAwait(false);
+                statusCode = response.StatusCode;
+                responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+
+                var list = JsonConvert.DeserializeObject<List<T>>(responseData, jsonSerializerSettings);
+                if (list == null)
+                {
+                    return Array.Empty<FirebaseObject<T>>();
+                }
+
+                return list.Select((item, index) => new FirebaseObject<T>(index.ToString(), item)).ToList();
             }
             catch (Exception ex)
             {
