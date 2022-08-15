@@ -62,10 +62,26 @@ namespace Firebase.Database.Query
                 throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
             }
 
-            return await this.GetClient(timeout).GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
+            return await this.GetClient(timeout).GetObjectDictionaryCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
                 .ConfigureAwait(false);
         }
 
+        public async Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsListAsync<T>(TimeSpan? timeout = null)
+        {
+            var url = string.Empty;
+
+            try
+            {
+                url = await this.BuildUrlAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
+            }
+
+            return await this.GetClient(timeout).GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
+                .ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Assumes given query is pointing to a single object of type <typeparamref name="T"/> and retrieves it.
