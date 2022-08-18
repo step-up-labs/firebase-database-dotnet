@@ -5,15 +5,14 @@ namespace FireBase.Database.Tests
     using Firebase.Database;
     using Firebase.Database.Query;
     using FluentAssertions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
 
-    [TestClass]
     public class FirebasePathTests
     {
         public const string BasePath = "http://base.path.net";
         public const string Token = "aBcEfgH";
 
-        [TestMethod]
+        [Fact]
         public void TestAuthPath()
         {
             var client = new FirebaseClient(BasePath, new FirebaseOptions());
@@ -23,7 +22,7 @@ namespace FireBase.Database.Tests
             path.Should().Be($"{BasePath}/resource/.json?auth={Token}");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestNestedAuthPath()
         {
             var client = new FirebaseClient(BasePath, new FirebaseOptions());
@@ -33,7 +32,7 @@ namespace FireBase.Database.Tests
             path.Should().Be($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestClientAuthPath()
         {
             var client = new FirebaseClient(BasePath, new FirebaseOptions { AuthTokenAsyncFactory = () => Task.FromResult(Token) });
@@ -43,7 +42,7 @@ namespace FireBase.Database.Tests
             path.Should().Be($"{BasePath}/resource/.json?orderBy=\"$key\"&auth={Token}");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCaseSensitivePath()
         {
             var client = new FirebaseClient(BasePath, new FirebaseOptions());
@@ -53,7 +52,7 @@ namespace FireBase.Database.Tests
             path.Should().Be($"{BasePath}/resource/.json?orderBy=\"$key\"&startAt=\"{Token}\"&endAt=\"{Token}\"");
         }
 
-        [TestMethod]
+        [Fact]
         public void OnlyChildPath()
         {
             var client = new FirebaseClient(BasePath, new FirebaseOptions());
