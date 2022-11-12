@@ -192,8 +192,15 @@
         /// <summary> 
         /// Starts observing the real-time Database. Events will be fired both when change is done locally and remotely.
         /// </summary> 
-        /// <returns> Stream of <see cref="FirebaseEvent{T}"/>. </returns>
-        public IObservable<FirebaseEvent<T>> AsObservable()
+        /// <param name="shouldReplayNotifications">
+        /// Whether or not the returned observable sequence should replay all notifications of the source for subscribers.
+        /// If this is false, then subscribers will receive notifications of the source from the time of the subscription on.
+        /// </param>
+        /// <returns>
+        /// Stream of <see cref="FirebaseEvent{T}"/>. An observable sequence that stays connected to the source as long as there is
+        /// at least one subscription to the observable sequence.
+        /// </returns>
+        public IObservable<FirebaseEvent<T>> AsObservable(bool shouldReplayNotifications = true)
         {
             if (!this.isSyncRunning)
             {
@@ -230,9 +237,20 @@
                             .Do(this.SetObjectFromInitialPull)
                             .Select(e => new FirebaseEvent<T>(e.Key, e.Object, e.Object == null ? FirebaseEventType.Delete : FirebaseEventType.InsertOrUpdate, FirebaseEventSource.OnlineInitial))
                             .Concat(Observable.Create<FirebaseEvent<T>>(observer => this.InitializeStreamingSubscription(observer))))
-                            .Do(next => { }, e => this.observable = null, () => this.observable = null)
-                    .Replay()
-                    .RefCount();
+                            .Do(next => { }, e => this.observable = null, () => this.observable = null);
+
+                if (shouldReplayNotifications)
+                {
+                    this.observable = this.observable
+                        .Replay()
+                        .RefCount();
+                }
+                else
+                {
+                    this.observable = this.observable
+                        .Publish()
+                        .RefCount();
+                }
             }
 
             return this.observable;
