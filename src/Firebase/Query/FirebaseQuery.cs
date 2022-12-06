@@ -66,6 +66,12 @@ namespace Firebase.Database.Query
                 .ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Assumes given query is pointing to a list of object of type <typeparamref name="T"/> and retrieves it.
+        /// </summary>
+        /// <param name="timeout"> Optional timeout value. </param>
+        /// <typeparam name="T"> Type of elements. </typeparam>
+        /// <returns> Single object of type <typeparamref name="T"/>. </returns>
         public async Task<IReadOnlyCollection<FirebaseObject<T>>> OnceAsListAsync<T>(TimeSpan? timeout = null)
         {
             var url = string.Empty;
@@ -91,6 +97,7 @@ namespace Firebase.Database.Query
         /// <returns> Single object of type <typeparamref name="T"/>. </returns>
         public async Task<T> OnceSingleAsync<T>(TimeSpan? timeout = null)
         {
+
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
             var url = string.Empty;
@@ -114,6 +121,43 @@ namespace Firebase.Database.Query
                 response.Dispose();
 
                 return JsonConvert.DeserializeObject<T>(responseData, Client.Options.JsonSerializerSettings);
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException(url, string.Empty, responseData, statusCode, ex);
+            }
+        }
+
+        /// <summary>
+        /// Returns the response data as json string.
+        /// </summary>
+        /// <param name="timeout"> Optional timeout value. </param>
+        /// <returns> Single object of type <typeparamref name="T"/>. </returns>
+        public async Task<string> OnceAsJsonAsync(TimeSpan? timeout = null)
+        {
+            var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
+            var url = string.Empty;
+
+            try
+            {
+                url = await this.BuildUrlAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException("Couldn't build the url", string.Empty, responseData, statusCode, ex);
+            }
+
+            try
+            {
+                var response = await this.GetClient(timeout).GetAsync(url).ConfigureAwait(false);
+                statusCode = response.StatusCode;
+                responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+                response.Dispose();
+
+                return responseData;
             }
             catch (Exception ex)
             {
