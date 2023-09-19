@@ -113,7 +113,9 @@
         public void Clear()
         {
             this.cache.Clear();
-            this.db.Delete<OfflineEntry>(Query.All());
+            // Only works for v4, v5 see https://github.com/mbdavid/LiteDB/issues/1478
+            //this.db.Delete<OfflineEntry>(Query.All());
+            this.db.DeleteMany<OfflineEntry>(_ => true);
         }
 
         /// <summary>
