@@ -47,7 +47,12 @@ namespace Firebase.Database.Query
 
             if (!(child is ChildQuery))
             {
-                return s + ".json";
+				if (!string.IsNullOrEmpty(child.Client.ns))
+				{
+					return s + ".json" + $"?ns={child.Client.ns}";
+				}
+
+				return s + ".json";
             }
 
             return s;

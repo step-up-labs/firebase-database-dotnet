@@ -18,20 +18,23 @@ namespace Firebase.Database
     {
         internal readonly IHttpClientProxy HttpClient;
         internal readonly FirebaseOptions Options;
+		private readonly string baseUrl;
 
-        private readonly string baseUrl;
+		public readonly string ns;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
         /// </summary>
         /// <param name="baseUrl"> The base url. </param>
         /// <param name="options"> The Firebase options. </param>  
-        public FirebaseClient(string baseUrl, FirebaseOptions options = null)
+        public FirebaseClient(string baseUrl, FirebaseOptions options = null, string ns = null)
         {
             this.Options = options ?? new FirebaseOptions();
-            this.HttpClient = Options.HttpClientFactory.GetHttpClient(null);
+			this.HttpClient = Options.HttpClientFactory.GetHttpClient(null);
 
             this.baseUrl = baseUrl;
+			this.ns = ns;
 
             if (!this.baseUrl.EndsWith("/"))
             {

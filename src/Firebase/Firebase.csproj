@@ -2,24 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>FirebaseDatabase.net</PackageId>
+    <PackageId>FirebaseDatabase.EmulatorSupported.net</PackageId>
     <PackageVersion>4.2.0</PackageVersion>
-    <Authors>Step Up Labs, Inc.</Authors>
-    <Description>Complex C# library for Firebase Realtime Database built on top of Firebase REST API. Among others it supports following:
-
-      * Offline storage
-      * Querying using available filters
-      * Passing in authentication token
-      * Streaming online changes
-      * Directly Posting / Putting / Patching online data
-
-      Streaming changes (both online and offline) are done using Reactive Extensions.
-    </Description>
+    <Authors>Yewo Theu</Authors>
+    <Description>A fork of the Firebase.net package by StepUp Labs which supports the use of firebase emulator for locally hosted realtime database.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageIconUrl>https://github.com/step-up-labs/firebase-database-dotnet/raw/master/art/FirebaseLogo.128x128.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/step-up-labs/firebase-database-dotnet</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Yewo-Devs/firebase-database-dotnet-emulator-supported</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/step-up-labs/firebase-database-dotnet/blob/master/LICENSE</PackageLicenseUrl>
-    <Copyright>Step Up Labs, Inc. 2019</Copyright>
+    <Copyright>Yewo Theu, 2024.</Copyright>
     <PackageTags>Firebase Database Realtime</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
